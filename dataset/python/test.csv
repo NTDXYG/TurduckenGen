@@ -1,0 +1,1154 @@
+nl,code
+"Generate origin code: Execute The SQL ( get The user column in The books where isbn is $isbn$ ) with $conn$ and get the first data. If the query result is None, return ""error"": ""The book is not in the database"" possessed by jsonify, otherwise return the query result.","from flask import jsonify
+def book_api ( conn , isbn ) :
+	 res = conn . execute ( "" select user from books where isbn = : isbn "" , { "" isbn "" : isbn } ) . fetchone ( )
+	 if res is None :
+	 	 return jsonify ( { "" error "" : "" The book is not in the database "" } )
+	 else :
+	 	 return res"
+"Generate origin code: Use $postgres$ to get the database engine and execute the SQL ( get the date_part in the stock_data ) and get all the data, and use the for loop to store the list type with the 'year' for the tenth element of each item in the query result, finally, return the list content that jsonify handles.","from sqlalchemy import create_engine
+from flask import jsonify
+def getyears ( postgres ) :
+	 engine = create_engine ( postgres )
+	 data = engine . execute ( "" select date_part from stock_data "" ) . fetchall ( )
+	 newdata = [ ]
+	 for x in data :
+	 	 d = { "" year "" : x [ 0 ] }
+	 	 newdata . append ( d )
+	 return jsonify ( newdata )"
+Generate origin code: Use $conn$ to execute SQL ( query all the information in the log table based on $information_schema$ ) and return all query results.,"def show_tables ( conn , information_schema ) :
+	 query = conn . execute ( "" select * from log where information_schema = : information_schema "" , { "" information_schema "" : information_schema } )
+	 return query . fetchall ( )"
+Generate origin code: Use $conn$ to execute SQL ( query all columns in the dialog table ) and get all the data. Return the query results.,"def dialog_showdb ( conn ) :
+	 texts = conn . execute ( "" select * from dialog "" ) . fetchall ( )
+	 return texts"
+"Generate origin code: Use $engine$ to connect to the database, execute SQL ( get the accident_name column in the accident_table whose accident_id is $id$ and accident_date is $date$ ) and get all the data. Use for loop to convert each item of the query result to a dictionary type and return it through the dumps method.","import json
+def example ( engine , id , date ) :
+	 connection = engine . connect ( )
+	 sql = "" select accident_name from accident_table where accident_id = : id and accident_date = : date "" 
+	 res = connection . execute ( sql , { "" id "" : id , "" date "" : date } ) . fetchall ( )
+	 return json . dumps ( [ dict ( r ) for r in res ] )"
+"Generate origin code: Try to use all the columns in the $conn$ ratings where the score is $score$, get all the data, and use a for loop to traverse the query results and print them. If an Exception occurs, return False.","def mysql_trace ( conn , score ) :
+	 try :
+	 	 kong = conn . execute ( "" select * from ratings where score = : score "" , { "" score "" : score } ) . fetchall ( )
+	 	 for item in kong :
+	 	 	 print ( item )
+	 except Exception :
+	 	 return False"
+"Generate origin code: Use the with statement to get the connection via $db$, execute the SQL ( get the Creator_Email in event_details based on $Ref_Code$ ) , get all the data, and finally return the obtained result.","def cancel ( db , Ref_Code ) :
+	 with db . connect ( ) as conn :
+	 	 sql_query = "" select Creator_Email from event_details where Ref_Code = : Ref_Code "" 
+	 	 creator_email = conn . execute ( sql_query , { "" Ref_Code "" : Ref_Code } ) . fetchall ( )
+	 	 return creator_email"
+Generate origin code: Use ORM method to query the first piece of data in the $User$ table with name as $name$ through $db$. Set the assertion to determine the length of the returned results is greater than 0 and return the query results.,"def get_value ( db , User , name ) :
+	 user = db . query ( User ) . filter_by ( User . name == name ) . first ( )
+	 assert len ( user ) > 0
+	 return user"
+"Generate origin code: Execute SQL ( get all columns in users where the name of user $username$ ) with $conn$ and get all the data. Then return rendered 'register.html', where the users parameter is the result of the query executing the SQL statement.","from flask import render_template
+def select_register ( conn , username ) :
+	 register_sql = "" select * from users where username = : username "" 
+	 users = conn . execute ( register_sql , { "" username "" : username } ) . fetchall ( )
+	 return render_template ( "" register.html "" , users = users )"
+"Generate origin code: Use $conn$ to execute SQL ( query all columns in the sightings table based on $lat$ and $lon$ ) and get all the query results. Use for loop to convert each of the query results into dict, and store them in list, and return this list.","def get_pokemon_spawned_at ( conn , lat , lon ) :
+	 query = conn . execute ( "" select * from sightings where lat = : lat and lon = : lon "" , { "" lat "" : lat , "" lon "" : lon } ) . fetchall ( )
+	 pokemons = [ dict ( r ) for r in query . fetchall ( ) ]
+	 return pokemons"
+"Generate origin code: If the request method is ""POST"", use $connection$ to get a cursor, set sql ( query the id column in the articles table based on $title$ and $body$ ) , execute SQL, get all the query results, close the connection, and return the query results.","from flask import request
+def edit_article ( connection , title , body ) :
+	 if request . method == "" POST "" :
+	 	 cur = connection . cursor ( )
+	 	 sql = "" select id from articles where title = : title and body = : body "" 
+	 	 render = cur . execute ( sql , { "" title "" : title , "" body "" : body } ) . fetchall ( )
+	 	 cur . close ( )
+	 	 return render"
+"Generate origin code: Try to connect the database with $db_connect$, execute the SQL statement: Query all the columns in the ticket table where tn is $user_tn$, convert each item of the query result to dict, store it as list, and use jsonify to return the query result. If an exception occurs, use jsonify to return 'error' ( where the 'error' content is 'fail' ) .","from flask import jsonify
+def get_user_tn ( db_connect , user_tn ) :
+	 try :
+	 	 conn = db_connect . connect ( )
+	 	 query = conn . execute ( "" select * from ticket where tn = : user_tn "" , { "" user_tn "" : user_tn } )
+	 	 result = [ dict ( i ) for i in query ]
+	 	 return jsonify ( result )
+	 except :
+	 	 return jsonify ( { "" error "" : "" fail "" } )"
+"Generate origin code: Use $db$ to connect the database, execute SQL ( query the number of all columns in the query_users table based on $user_id$ ) , set theassertion to determine whether the length of all the data obtained is 0, and close the connection.","def query_page ( db , user_id ) :
+	 connection = db . connect ( )
+	 result = connection . execute ( "" select count(*) from query_users where user_id = : user_id "" , { "" user_id "" : user_id } )
+	 assert len ( result . fetchall ( ) ) != 0
+	 connection . close ( )"
+"Generate origin code: Connect to the database according to $engine$ through the with statement. Set the SQL statement and the content is as follows: Query all columns in the movies_mean_count table whose rating_count is greater than $rating$, and execute SQL to get all the data. Use for loop to store each element in the query result into list and return the list content.","def get_most_rated_movies ( engine , rating ) :
+	 with engine . connect ( ) as conn :
+	 	 query = "" select * from movies_mean_count where rating_count > : rating "" 
+	 	 results = conn . execute ( query , { "" rating "" : rating } ) . fetchall ( )
+	 	 movie_ids = [ ]
+	 	 for result in results :
+	 	 	 movie_ids . append ( result )
+	 	 return movie_ids"
+"Generate origin code: Use $conn$ to execute SQL ( query all columns in the pooling table based on $client$ ) , get all the query results, and set assertions to determine whether the length of the query results is greater than 0.","def test_main_pooling ( conn , client ) :
+	 v = conn . execute ( "" select * from pooling where client = : client "" , { "" client "" : client } ) . fetchall ( )
+	 assert len ( v ) > 0"
+"Generate origin code: Set SQL with the python expression ( query all the information in the $users$ table based on $username$ ) . Use $conn$ to execute SQL and get all query results. If all the results of the query are None, a $UnauthorizedError$ exception is formed. Otherwise, return the query result.","from sqlalchemy . sql import select
+def login ( conn , users , username , UnauthorizedError ) :
+	 s = select ( [ users ] ) . where ( users . c . username == username )
+	 recs_data = conn . execute ( s ) . fetchall ( )
+	 if recs_data is None :
+	 	 raise UnauthorizedError
+	 else :
+	 	 return recs_data"
+"Generate origin code: Use $eng$ to get the connection, and use the python expression to set up SQL: Query all the information in the $tab$ table based on $code_no$. Use the database connection to execute the SQL, get all the data, and finally return the query results.","from sqlalchemy . sql import select
+def modify ( eng , tab , code_no ) :
+	 conn = eng . connect ( )
+	 sql = select ( tab ) . where ( tab . c . code_no == code_no )
+	 r = conn . execute ( sql ) . fetchall ( )
+	 return r"
+"Generate origin code: Set SQL ( query the rating column in the review table based on $average_score$ and $review_count$ ) , execute SQL based on $conn$ and get all the query results. If no results is queried, return the dictionary converted to json format, where the value of the ""Error"" key is set to ""No book""; otherwise, return the dictionary converted to json format, where the value of the ""title"" key is set to the title field of the query result, the value of the ""author"" key is set to the author field of the query result, and the value of the ""year"" key is set to the pub_year field of the query result.","from flask import jsonify
+def api ( conn , average_score , review_count ) :
+	 sql = "" select rating from review where average_score = : average_score and review_count = : review_count "" 
+	 api_book = conn . execute ( sql , { "" average_score "" : average_score , "" review_count "" : review_count } ) . fetchall ( )
+	 if not api_book :
+	 	 return jsonify ( { "" Error "" : "" No book "" } )
+	 return jsonify ( { "" title "" : api_book . title , "" author "" : api_book . author , "" year "" : api_book . pub_year } )"
+Generate origin code: Use $conn$ to execute SQL ( query all columns in the class_schedule table ) and get all the data. Return the rendered 'create.html' and pass the query results to the data parameter.,"from flask import render_template
+def create ( conn ) :
+	 data = conn . execute ( "" select * from class_schedule "" ) . fetchall ( )
+	 return render_template ( "" create.html "" , data = data )"
+"Generate origin code: Through the $conn$ to connect, and use ORM to execute the SQL statement: Query the first piece of data in the $Event$ table where end_date is greater than $time_now$, and return the query results that converted to dict.","def index ( conn , Event , time_now ) :
+	 matching_events = conn . query ( Event ) . filter ( Event . end_date > time_now ) . fetchone ( )
+	 return dict ( matching_events )"
+"Generate origin code: Connect to the database engine using $e$, and execute SQL ( query all date columns in the RInd ) using $conn$. Finally, the keys of the result are executed as the key in the dictionary, and the cursors of each item in the result are executed as the corresponding values. Put each item in the dictionary into a list and return it.","def search ( e ) :
+	 conn = e . connect ( )
+	 query = conn . execute ( "" select date from RInd "" )
+	 rs = [ dict ( zip ( tuple ( query . keys ( ) ) , record ) ) for record in query . cursor ]
+	 return rs"
+Generate origin code: Use $conn$ to execute the SQL ( get the name column in the Consumables table based on $id$ ) and get all the data. Then use for loop to convert each item of the query result into dictionary type and return the contents of dictionary.,"def get_consumables ( conn , id ) :
+	 sql_consumable = "" select name from Consumables where id = : id "" 
+	 rs = conn . execute ( sql_consumable , { "" id "" : id } ) . fetchall ( )
+	 return [ dict ( row ) for row in rs ]"
+Generate origin code: Use $engine$ in the with statement to get the database connection. Use the connection to execute SQL ( query all columns in audio_features when youtube_id is $yt_id$ ) and get the first piece of data. Return the query results.,"def select_cluster ( engine , yt_id ) :
+	 with engine . connect ( ) as con :
+	 	 audio_id = con . execute ( "" select * from audio_features where youtube_id = : yt_id "" , { "" yt_id "" : yt_id } ) . fetchone ( )
+	 	 return audio_id"
+"Generate origin code: Set SQL ( get all the columns in the 'table' table based on $filter$ ) , connect to the database using $engine$ through the with statement, execute the SQL statement to get all the data, and finally return the query result.","def select ( engine , filter ) :
+	 query = "" select * from table where filter = : filter "" 
+	 with engine . connect ( ) as connection :
+	 	 result = connection . execute ( query , { "" filter "" : filter } ) . fetchall ( )
+	 	 return result"
+"Generate origin code: Use $conn$ to execute SQL ( query all columns in the flights table based on $fli_id$ ) , get all the query results, return the rendered ""flights.html"" page, and set the flights parameter to the query result.","from flask import render_template
+def flights ( conn , fli_id ) :
+	 flights = conn . execute ( "" select * from flights where fli_id = : fli_id "" , { "" fli_id "" : fli_id } ) . fetchall ( )
+	 return render_template ( "" flights.html "" , flights = flights )"
+Generate origin code: Query the first piece of clock with id as $id$ in the horse table through $session$. Make sure $session$ is closed and return the query results.,"def query_data ( session , id ) :
+	 res = session . execute ( "" select clock from horse where id = : id "" , { "" id "" : id } ) . fetchone ( )
+	 session . close ( )
+	 return res"
+"Generate origin code: Trough $conn$ to connect, use the Python expression to set the SQL statement to get all the name in $targets$ based on $id$ , execute the SQL and return the fetched data.","from sqlalchemy . sql import select
+def get_target_byid ( conn , targets , id ) :
+	 s = select ( targets . c . name ) . where ( targets . c . id == id )
+	 return conn . execute ( s ) . fetchall ( )"
+"Generate origin code: Use $conn$ to execute the SQL ( get the synopsis column in the books table based on $id$ ) , then convert the 0th element of the 0th item of the query result into list, and finally return the list contents","def application ( conn , id ) :
+	 query = "" select synopsis from books where id = : id "" 
+	 output = conn . execute ( query , { "" id "" : id } )
+	 output = list ( output ) [ 0 ] [ 0 ]
+	 return output"
+"Generate origin code: Try to use $MYSQL_DB_URL$ to get the database engine and connect to the database, then execute the SQL based on the Python expression ( get all columns in the $table$ table with the id as $uid$ ) and get all the data. Then close the connection and return the query results. If exception occurs during execution, print the exception.","from sqlalchemy . sql import select
+from sqlalchemy import create_engine
+def get_source ( MYSQL_DB_URL , uid , table ) :
+	 try :
+	 	 db = create_engine ( MYSQL_DB_URL )
+	 	 con = db . connect ( )
+	 	 sql = select ( [ table ] ) . where ( table . c . id == uid )
+	 	 res = con . execute ( sql ) . fetchall ( )
+	 	 con . close ( )
+	 	 return res
+	 except Exception as e :
+	 	 print ( e )"
+"Generate origin code: Get database engine by $db_string$, try to execute SQL statement ( get all columns in project based on $id_fornecedor$ ) and get all the data. The result will be given true, otherwise print ""Problem occur!"" and the result will be given false. Finally return the result true or false.","from sqlalchemy import create_engine
+def querySale ( db_string , id_fornecedor ) :
+	 db = create_engine ( db_string )
+	 try :
+	 	 db . execute ( "" select * from project where id_fornecedor = : id_fornecedor "" , { "" id_fornecedor "" : id_fornecedor } ) . fetchall ( )
+	 	 res = True
+	 except :
+	 	 print ( "" Problem occur! "" )
+	 	 res = False
+	 return res"
+"Generate origin code: If the request method is 'POST', use $db$ to execute SQL according to the python expression ( get the username column in the $users$ table whose first_name is $fname$ and password is $pwd$ ) , get the first piece of data, and then return the query result.","from flask import request
+def checklogin ( db , users , fname , pwd ) :
+	 if request . method == "" POST "" :
+	 	 res = db . execute ( users . select ( [ users . username ] ) . where ( users . first_name == fname and users . password == pwd ) ) . fetchone ( )
+	 	 return res"
+"Generate origin code: Try to use $conn$ to query all the columns in the manager table where orderid is $orderid$, get all the data, use for loop to store the 0th element of each item in the query result into list and return the list content. Print 'query fail' if there is an exception.","def get_hall_name_from_manager_id ( conn , orderid ) :
+	 try :
+	 	 row = conn . execute ( "" select * from manager where orderid = : orderid "" , { "" orderid "" : orderid } ) . fetchall ( )
+	 	 k = [ ]
+	 	 for r in row :
+	 	 	 k . append ( r [ 0 ] )
+	 	 return k
+	 except :
+	 	 print ( "" query fail "" )"
+"Generate origin code: Set up SQL ( query the trained_model column in the models table based on $accuracy_score$ ) . Use $dbconn$ to execute the SQL, get the first piece of data, and return the 0th element of the query result.","def get_best_model ( dbconn , accuracy_score ) :
+	 	 query_sql = "" select trained_model from models where accuracy_score = : accuracy_score "" 
+	 	 results = dbconn . execute ( query_sql , { "" accuracy_score "" : accuracy_score } ) . fetchone ( )
+	 	 return results [ 0 ]"
+"Generate origin code: Try using $db$ to execute the SQL ( query the title information in the books table where isbn is $isbn$ ) and get the first data, return the rendered ""book.html"" and pass the query result to the book parameter. Redirect and url_for redirect to 'error' if an exception occurs. Finally make sure $db$ is closed.","from flask import render_template , redirect , url_for
+def get_book ( db , isbn ) :
+	 try :
+	 	 book = db . execute ( "" select title from books where isbn = : isbn "" , { "" isbn "" : isbn } ) . fetchone ( )
+	 	 return render_template ( "" book.html "" , book = book )
+	 except :
+	 	 return redirect ( url_for ( "" error "" ) )
+	 finally :
+	 	 db . close ( )"
+Generate origin code: Use $conn$ to execute SQL ( query the id in the current_user table based on $created_at$ ) and get the first piece of data. Set the assertion to determine that the query result is not empty list. Return the query results.,"def current_session ( conn , created_at ) :
+	 user_id = conn . execute ( "" select id from current_user where created_at = : created_at "" , { "" created_at "" : created_at } ) . fetchone ( )
+	 assert user_id != [ ]
+	 return user_id"
+"Generate origin code: Use $db_uri$ to get the database engine and execute SQL ( get the data column in the example table according to $id$ ) , get all the data, and finally return the query result.","from sqlalchemy import create_engine
+def search_datas ( db_uri , id ) :
+	 engine = create_engine ( db_uri )
+	 datas = engine . execute ( "" select data from example where id = : id "" , { "" id "" : id } ) . fetchall ( )
+	 return datas"
+"Generate origin code: Try to use $engine$ to execute the SQL ( get all the information in db_satz where uid is $uid$ and pro is $pro$ ) and get all the data, return the query result, otherwise return None.","def satz_positiv_bewerten ( engine , uid , pro ) :
+	 try :
+	 	 rs = engine . execute ( "" select * from db_satz where uid = : uid and pro = : pro "" , { "" uid "" : uid , "" pro "" : pro } ) . fetchall ( )
+	 	 return rs
+	 except :
+	 	 return None"
+"Generate origin code: Connect the database through $engine$ and set the SQL based on the python expression ( query all the columns in the $test_users$ table based on $lastname$ ) . Execute SQL, get all the data and return the query results.","from sqlalchemy . sql import select
+def testBulkUpdate ( engine , test_users , lastname ) :
+	 conn = engine . connect ( )
+	 session = select ( test_users ) . where ( test_users . c . lastname == lastname )
+	 results = conn . execute ( session ) . fetchall ( )
+	 return results"
+"Generate origin code: Create a database engine based on $morphweb_db$ and use it to create session instantiated objects. Use instantiated objects to execute SQL ( query the ip in the usertable based on $email$ ) , get the first piece of data, and print the 0th element of each item of the query result.","from sqlalchemy import create_engine
+from sqlalchemy . orm . session import sessionmaker
+def user_ip ( morphweb_db , email ) :
+	 engine = create_engine ( morphweb_db )
+	 DB_Session = sessionmaker ( bind = engine )
+	 session = DB_Session ( )
+	 ret = session . execute ( "" select ip from usertable where email = : email "" , { "" email "" : email } ) . fetchone ( )
+	 for t in ret :
+	 	 return t [ 0 ]"
+"Generate origin code: Use $conn$ to execute SQL ( query all columns in the users table when username equals $name$ ) and get all the data. If the query result is not empty list, return the rendered 'error.html'. Otherwise, return the rendered ""success.html"" and pass the query result to the unique parameter.","from flask import render_template
+def queryeuser ( conn , name ) :
+	 unique = conn . execute ( "" select * from users where username = : name "" , { "" name "" : name } ) . fetchall ( )
+	 if unique != [ ] :
+	 	 return render_template ( "" error.html "" )
+	 return render_template ( "" success.html "" , unique = unique )"
+"Generate origin code: Try to use $connection$ to execute SQL ( query all the information in the query_users table based on $user_id$ and $user_name$ ) , and print the Exception if it is caught. Set the assertion to determine whether the length of all the obtained data is 0, and close the connection.","def test_raise ( connection , user_id , user_name ) :
+	 try :
+	 	 result = connection . execute ( "" select * from query_users where user_id = : user_id and user_name = : user_name "" , { "" user_id "" : user_id , "" user_name "" : user_name } )
+	 except Exception as e :
+	 	 print ( e )
+	 assert len ( result . fetchall ( ) ) == 0
+	 connection . close ( )"
+Generate origin code: Set up the SQL using a Python expression ( query the data column in $z_test$ where id is $id$ ) and execute the SQL using $conn$ to get the first query result and return it.,"from sqlalchemy . sql import select
+def query_old_recs ( conn , z_test , id ) :
+	 s = select ( z_test . c . data ) . where ( z_test . c . id == id )
+	 recs = conn . execute ( s ) . first ( )
+	 return recs"
+Generate origin code: Execute the SQL statement via $conn$: Query all the id data in the books table based on $user_id$ and $book_id$ and return the query results.,"def check_user_book_authorized ( conn , user_id , book_id ) :
+	 result = conn . execute ( "" select id from books where user_id = : user_id and book_id = : book_id "" , { "" user_id "" : user_id , "" book_id "" : book_id } ) . fetchall ( )
+	 return result"
+Generate origin code: Execute the SQL based on $conn$ ( get the name column in the user table based on $group_id$ ) and get all the data. Use for loop to print each item of the query results.,"def sql_stm ( conn , group_id ) :
+	 stm = "" select name from user where group_id = : group_id "" 
+	 result_proxy = conn . execute ( stm , { "" group_id "" : group_id } )
+	 rows = result_proxy . fetchall ( )
+	 for row in rows :
+	 	 print ( row )"
+"Generate origin code: Connect to the database through $testing$. Set up the SQL statement using the Python expression ( get all id in $users$ table based on $name$ ) , execute the SQL statement, make sure the database connection is closed. Convert each item of the query result into dict and store it as list and return it.","from sqlalchemy . sql import select
+def get_info ( testing , users , name ) :
+	 conn = testing . connect ( )
+	 s = select ( users . c . id ) . where ( users . c . name == name )
+	 information = conn . execute ( s ) . fetchall ( )
+	 conn . close ( )
+	 return [ dict ( row ) for row in information ]"
+"Generate origin code: Execute the SQL ( get all the columns in the report where portfolio is $portfolio$ and date is $date$ ) with $conn$, get all the data, and return the results of the query.","def get_portfolio ( conn , portfolio , date ) :
+	 qry = "" select * from report where portfolio = : portfolio and date = : date "" 
+	 df = conn . execute ( qry , { "" portfolio "" : portfolio , "" date "" : date } ) . fetchall ( )
+	 return df"
+"Generate origin code: Use the $conn$ connection to execute the SQL statement: Get all the columns in the flights table based on $id$ and get all the data. If the query result exists, render and return ""indexair.html"", where the flights parameter is the query result.","from flask import render_template
+def index ( conn , id ) :
+	 res = conn . execute ( "" select * from flights where id = : id "" , { "" id "" : id } ) . fetchall ( )
+	 if res :
+	 	 return render_template ( "" indexair.html "" , flights = res )"
+Generate origin code: Set SQL based on the python expression ( query the stringify column in the $table$ table based on $name$ ) . Return all the data obtained by executing SQL through $conn$.,"from sqlalchemy . sql import select
+def query ( conn , table , name ) :
+	 s = select ( table . c . stringify ) . where ( table . c . name == name )
+	 return conn . execute ( s ) . fetchall ( )"
+"Generate origin code: Use the ORM method and $conn$ to execute SQL ( query all the information in the $leases$ table according to $mac$ ) , get all the queried data, use for loop to traverse all the query results, insert the 0th element of each piece of data into a list, and use for loop to print the list.","def main ( conn , leases , mac ) :
+	 results = conn . query ( leases ) . filter ( leases . mac == mac ) . all ( )
+	 results = [ t [ 0 ] for t in results ]
+	 for ip in results :
+	 	 print ( ip )"
+"Generate origin code: Get the database engine by $url$. Try to set the SQL: Query the task_id data with task_enumber of $enumber$ in the finishedtask table. Execute SQL to get all data and return. If there is an Exception, return the exception information by logging.error ( ) method.","import logging
+from sqlalchemy import create_engine
+def my_query ( url , enumber ) :
+	 engine = create_engine ( url )
+	 try :
+	 	 stm = "" select task_id from finishedtask where task_enumber = : enumber "" 
+	 	 res = engine . execute ( stm , { "" enumber "" : enumber } ) . fetchall ( )
+	 	 return res
+	 except Exception as e :
+	 	 logging . error ( e )"
+"Generate origin code: Open and read the file ""books.csv"", loop 'author' in the file, set the SQL ( query the isbn column in the books table based on each author ) , use $conn$ to execute to get all the query results and print.","import csv
+def select_isbn ( conn ) :
+	 f = open ( "" books.csv "" )
+	 reader = csv . reader ( f )
+	 for author in reader :
+	 	 sql = "" select isbn from books where author = : author "" 
+	 	 isbns = conn . execute ( sql , { "" author "" : author } ) . fetchall ( )
+	 	 print ( isbns )"
+"Generate origin code: Set SQL according to the python expression: ( query all the results of all columns in the $user$ table based on $userID$ ) . Get the database engine through $URI$ to execute SQL, use for loop to traverse each query result, and finally print each result.","from sqlalchemy . sql import select
+from sqlalchemy import create_engine
+def getEntryFromUserTable ( URI , user , userID ) :
+	 engine = create_engine ( URI )
+	 connection = engine . connect ( )
+	 selectUser = select ( user ) . where ( user . c . userID == userID )
+	 for row in connection . execute ( selectUser ) :
+	 	 print ( row )"
+"Generate origin code: Set SQL based on the Python expression: ( query $table$ table for purchase_type column based on $rec_id$ ) . Execute SQL by $conn$ and get all the data, return True if the length of the query result converted to tuple is not equal to 0, otherwise return False.","from sqlalchemy . sql import select
+def is_custom_types ( conn , table , rec_id ) :
+	 sql = select ( [ table . c . purchase_type ] ) . where ( table . c . rec_id == rec_id )
+	 types = conn . execute ( sql ) . fetchall ( )
+	 if len ( tuple ( types ) ) != 0 :
+	 	 return True
+	 else :
+	 	 return False"
+Generate origin code: Use $conn$ to execute SQL ( get all data in db_table based on $db_id$ ) . Return all the query results after executing the statement.,"def read_from_sql_server ( conn , db_id ) :
+	 dbtexts = conn . execute ( "" select * from db_table where db_id = : db_id "" , { "" db_id "" : db_id } )
+	 return dbtexts . fetchall ( )"
+"Generate origin code: Use $conn$ connection to execute SQL statement : Get all columns in books table based on $isbn$ and $title$, and get all data. If the query result is empty, use jsonify to return ""error"" with the content ""Not Found""; otherwise, return the query result.","from flask import jsonify
+def query_books ( conn , isbn , title ) :
+	 row = conn . execute ( "" select * from books where isbn = : isbn and title = : title "" , { "" isbn "" : isbn , "" title "" : title } ) . fetchall ( )
+	 if row is None :
+	 	 return jsonify ( { "" error "" : "" Not Found "" } )
+	 else :
+	 	 return row"
+"Generate origin code: Use the with statement to connect the database according to $engine$. Execute the SQL ( according to the itemName column of items in the $manufacturer$ table ) , get all the query results, convert each item of the query results to dict, store them as list, and return.","def get_beers ( engine , manufacturer ) :
+	 with engine . connect ( ) as con :
+	 	 rs = con . execute ( "" select itemName from items where manufacturer = : manufacturer "" , { "" manufacturer "" : manufacturer } ) . fetchall ( )
+	 	 return [ dict ( row ) for row in rs ]"
+"Generate origin code: Set the SQL statement ( query all columns in the flow table based on $userid$ and $sessionid$ ) , use e$conn$ to execute SQL to get all the data, use for loop traversal to query the results, and print the userid attribute value of the query results.","def evaluateUsersWithFewSessions ( conn , userid , sessionid ) :
+	 query = "" select * from flow where userid = : userid and sessionid = : sessionid "" 
+	 resultFlowPerUser = conn . execute ( query , { "" userid "" : userid , "" sessionid "" : sessionid } ) . fetchall ( )
+	 for userFlow in resultFlowPerUser :
+	 	 print ( userFlow . userid )"
+"Generate origin code: Use $conn$ to execute the SQL statement ( query all the columns in the members table ) to get all the data, render and return ""index.html"", where the members parameter is the execution result.","from flask import render_template
+def index ( conn ) :
+	 members = conn . execute ( "" select * from members "" ) . fetchall ( )
+	 return render_template ( "" index.html "" , members = members )"
+"Generate origin code: Set up the SQL ( query all sequence_name in sequences where schemaval is $schemaval$ ) , execute the SQL over the $conn$ connection and get the data. Store the 0th element of each item of the query result as a list and return.","def get_seq_list_from_db ( conn , schemaval ) :
+	 sql = "" select sequence_name from sequences where schemaval= "" + schemaval
+	 names = conn . execute ( sql )
+	 return [ name [ 0 ] for name in names ]"
+"Generate origin code: Set the SQL statement: Query all the columns in the dnsreqs table with $d_id$, use $ses$ to execute SQL to get all the data. For loop iterates through the execution results and print.","def get_dns_http ( ses , d_id ) :
+	 sql = "" select * from dnsreqs where d_id = : d_id "" 
+	 results = ses . execute ( sql , { "" d_id "" : d_id } ) . fetchall ( )
+	 for row in results :
+	 	 print ( row )"
+"Generate origin code: Use format method to set the SQL: Query the category_id from the Categories table based on $category$, then use $conn$ to execute and get all the data, and finally return the data.","def category_id ( conn , category ) :
+	 sql = "" select category_id from Categories where category={} "" . format ( category )
+	 result = conn . execute ( sql ) . fetchall ( )
+	 return result"
+"Generate origin code: In the with statement, use $engine$ to get the connection and execute the following code to set the SQL: query the name information in Table D based on $drinkerID$. Execute the SQL using the link and obtain all the data, convert each item in the query result to a dict type and return.","def get_frequents ( engine , drinkerID ) :
+	 with engine . connect ( ) as con :
+	 	 sql = "" select name from D where drinkerID = : drinkerID "" 
+	 	 rs = con . execute ( sql , { "" drinkerID "" , drinkerID } ) . fetchall ( )
+	 	 return [ dict ( row ) for row in rs ]"
+"Generate origin code: Get the database engine and establish a connection through $DATABASEURI$. Execute the SQL statement ( query all the columns in the teams table according to $id$ ) , get all the data, take the query result as the value of the parameter rows, and return the rendered ""listteam.html"" page.","from sqlalchemy import create_engine
+from flask import render_template
+def listteam ( DATABASEURI , id ) :
+	 engine = create_engine ( DATABASEURI )
+	 conn = engine . connect ( )
+	 res = conn . execute ( "" select * from teams where id = : id "" , { "" id "" : id } ) . fetchall ( )
+	 return render_template ( "" listteam.html "" , rows = res )"
+"Generate origin code: Use the $conn$ connection to execute SQL ( query the first destination data in the flights table through $fid$ ) . If the query result is empty, print 'Error: no such flight.' and return. Use for loop to traverse the query result and print it.","def main ( conn , fid ) :
+	 fout = conn . execute ( "" select destination from flights where fid = : fid "" , { "" fid "" : fid } ) . fetchone ( )
+	 if fout is None :
+	 	 print ( "" Error: no such flight. "" )
+	 	 return
+	 for fout in fout :
+	 	 print ( fout )"
+"Generate origin code: Use the Python expression to set up the SQL statement: Query the statistics values in the $articles_table$ table based on $month$ and $year$, use $connection$ to execute the SQL to get the first piece of data and return the execution result.","from sqlalchemy . sql import select , func , and_
+def get_undescribed_article_count ( connection , articles_table , month , year ) :
+	 s = select ( [ func . count ( articles_table ) ] ) . where ( and_ ( articles_table . c . month == month , articles_table . c . year == year ) )
+	 rp = connection . execute ( s ) . fetchone ( )
+	 return rp"
+"Generate origin code: Use $conn$ to execute SQL ( query all columns in the flights table according to $name$ ) , get all the query results, set assertions to determine whether the query result length is not equal to 0, and return to the rendered ""index.html"" page, where the parameter flights is set to the query result.","from flask import render_template
+def index ( conn , name ) :
+	 flights = conn . execute ( "" select * from flights where name = : name "" , { "" name "" : name } ) . fetchall ( )
+	 assert flights != [ ]
+	 return render_template ( "" index.html "" , flights = flights )"
+"Generate origin code: Connect to the database using $conn$, execute SQL statements ( query all number data in the availability_data where available_bikes is $available_bikes$ ) , and use the for loop to traverse the query results and print them.","def avail_to_db ( conn , available_bikes ) :
+	 data_points = conn . execute ( "" select number from availability_data where available_bikes = : available_bikes "" , { "" available_bikes "" : available_bikes } ) . fetchall ( )
+	 for data in data_points :
+	 	 print ( data )"
+"Generate origin code: Use the python expression to set SQL ( query the id in the $contacts$ table when uuid is $contact_uuid$ ) . Use $conn$ to execute SQL and get the first piece of data. If the data obtained is not None, return the query result. Otherwise, None is returned.","from sqlalchemy . sql import select
+def get_contact ( conn , contacts , contact_uuid ) :
+	 first = select ( contacts . c . id ) . where ( contacts . c . uuid == contact_uuid )
+	 contact = conn . execute ( first ) . fetchone ( )
+	 if contact is not None :
+	 	 return contact
+	 else :
+	 	 return None"
+Generate origin code: Use $conn$ to execute SQL based on the Python expression ( get all columns in $SubDomain$ table based on $is_new$ ) and get all the data. Then use for loop to convert each item of query result into list and finally return the contents of list.,"from sqlalchemy . sql import select
+def select_mode ( conn , SubDomain , is_new ) :
+	 sql = select ( SubDomain ) . where ( SubDomain . c . is_new == is_new )
+	 results = conn . execute ( sql ) . fetchall ( )
+	 results_list = [ ]
+	 for result in results :
+	 	 results_list . append ( result )
+	 return results_list"
+"Generate origin code: Use $conn$ to execute SQL statement: Get all columns in table based on $key$, execute SQL and get all the data. Store the 0th element of each item of query results as list and return it.","def select_keys ( conn , key ) :
+	 result = conn . execute ( "" select * from table where key = : key "" , { "" key "" : key } ) . fetchall ( )
+	 result = [ x [ 0 ] for x in result ]
+	 return result"
+"Generate origin code: Use 'with' statement to connect to database based on $engine$. Set SQL based on the Python expression: ( query all columns in $eta$ table based on SPRINT_ID: $id$ ) . Execute SQL statement, get all the data, use for loop to convert each query result to dict, store in list and return.","from sqlalchemy . sql import select
+def get_source ( engine , id , eta ) :
+	 with engine . connect ( ) as conn :
+	 	 sql = select ( [ eta ] ) . where ( eta . c . SPRINT_ID == id )
+	 	 etas = conn . execute ( sql ) . fetchall ( )
+	 	 return [ dict ( row ) for row in etas ]"
+Generate origin code: Use $conn$ to execute the SQL ( query the table_namet table for old information based on $uc_name$ ) and get all the data. Use for loop to store the 0th element of each item in the result to list and return.,"def get_unique_constraint ( conn , uc_name ) :
+	 ucname = conn . execute ( "" select old from table_namet where name = : uc_name "" , { "" uc_name "" : uc_name } ) . fetchall ( )
+	 namet = [ ]
+	 for r in ucname :
+	 	 namet . append ( r [ 0 ] )
+	 return namet"
+"Generate origin code: Try to execute the following code: Get the connection through $url$ and set the client_encoding parameter to 'utf8'. Execute SQL in ORM ( query all columns in the $Story_table$ table based on $author$ ) and get all the query results. Finally, return the query result. If an exception occurs, print the exception information.","import sqlalchemy
+def init_pg ( url , Story_table , author ) :
+	 try :
+	 	 conn = sqlalchemy . create_engine ( url , client_encoding = "" utf8 "" )
+	 	 values = conn . query ( Story_table ) . filter ( Story_table . author == author ) . all ( )
+	 	 return values
+	 except Exception as ex :
+	 	 raise ex"
+"Generate origin code: Use $conn_string$ to get the database engine and execute SQL ( get the target column in the targets table based on $url$, $email$ and $id$ ) , get the first piece of data, and finally return the query result.","from sqlalchemy import create_engine
+def get_target ( conn_string , url , email , id ) :
+	 engine = create_engine ( conn_string )
+	 sql = "" select target from targets where url = : url and email = : email and id = : id "" 
+	 target = engine . execute ( sql , { "" url "" : url , "" email "" : email , "" id "" : id } ) . fetchone ( )
+	 return target"
+"Generate origin code: Get the database engine via $connection_string$ with the echo parameter being False, and establish a connection. Set up the SQL statement ( query all the columns in the saltie table based on $value$ ) , get all the data, close the connection, and return the query results.","from sqlalchemy import create_engine
+def select_value ( connection_string , value ) :
+	 engine = create_engine ( connection_string , echo = False )
+	 conn = engine . connect ( )
+	 query_sql = "" select * from saltie where value = : value "" 
+	 results = conn . execute ( query_sql , { "" value "" : value } ) . fetchall ( )
+	 conn . close ( )
+	 return results"
+"Generate origin code: Use the Python expression to set the SQL statement as follows: Get the hash information in the $files$ table through $path$, execute SQL to get the first piece of data, make sure that $conn$ is closed. If there is no query result, return False, otherwise return the 0th element of the query results.","from sqlalchemy . sql import select
+def get ( conn , files , path ) :
+	 s = select ( [ files . c . hash ] , files . c . path == path )
+	 r = conn . execute ( s ) . fetchone ( )
+	 conn . close ( )
+	 if not r :
+	 	 return False
+	 return r [ 0 ]"
+"Generate origin code: Use $engine$ to connect to the database by the with statement, execute the SQL ( get all columns in drinkers based on $drinkerID$ ) and get all data. Finally return the query result.","def generateDrinkerID ( drinkerID , engine ) :
+	 with engine . connect ( ) as con :
+	 	 query = "" select * from drinkers where drinkerID = : drinkerID "" 
+	 	 rs = con . execute ( query , { "" drinkerID "" : drinkerID } ) . fetchall ( )
+	 	 return rs"
+"Generate origin code: Execute the SQL ( get the table_name column in the information_schema where table_schema is $table_schema$ ) with $conn$ and get all the data, then use the for loop to store the list type for the tenth element of each item in the query result and return.","def get_table_list_from_db ( conn , table_schema ) :
+	 sql = "" select table_name from information_schema where table_schema = : table_schema "" 
+	 res = conn . execute ( sql , { "" table_schema "" : table_schema } ) . fetchall ( )
+	 return [ name [ 0 ] for name in res ]"
+"Generate origin code: Open the books.csv file and read it, use for loop traversal to iterate over the content, and use $conn$ to execute the SQL statement: Query all the isbn in the books table through 'title' and print the query results.","import csv
+def main ( conn ) :
+	 f = open ( "" books.csv "" )
+	 reader = csv . reader ( f )
+	 for title in reader :
+	 	 res = conn . execute ( "" select isbn from books where title = : title "" , { "" title "" : title } ) . fetchall ( )
+	 	 print ( res )"
+"Generate origin code: If $titulo$ is not None, then execute SQL through $conn$ ( get all columns in the peliculas table based on $title$ ) and get all the data. Then use for loop to store each item of the query results as list and finally return the list.","def get_pelis_by_name ( conn , titulo ) :
+	 if titulo is not None :
+	 	 sql = "" select * from peliculas where titulo = : titulo "" 
+	 	 results = conn . execute ( sql , { "" titulo "" : titulo } ) . fetchall ( )
+	 	 pelicula = [ ]
+	 	 for row in results :
+	 	 	 pelicula . append ( row )
+	 	 return pelicula"
+Generate origin code: Get the database engine through $sqlite$. Execute the SQL statement ( query the first piece of name data in the hello table based on $hid$ ) . Return all the query results.,"from sqlalchemy import create_engine
+def query_info ( sqlite , hid ) :
+	 engine = create_engine ( sqlite )
+	 hres = engine . execute ( "" select name from hello where hid = : hid "" , { "" hid "" : hid } ) . fetchone ( )
+	 return hres"
+"Generate origin code: Use $conn$ to execute SQL ( query all columns in the Substitutes table based on $id_orig$ and $id_sub$ ) , get all the data, and add each item of the query result to the empty list. If the length of list is 0, return None; otherwise, return the query result in list form.","def save_products ( conn , id_orig , id_sub ) :
+	 data = conn . execute ( "" select * from Substitutes where id_orig = : id_orig and id_sub = : id_sub "" , { "" id_orig "" : id_orig , "" id_sub "" : id_sub } ) . fetchall ( )
+	 response = [ ]
+	 for i in data :
+	 	 response . append ( i )
+	 if len ( response ) == 0 :
+	 	 return None
+	 return response"
+"Generate origin code: Create a cursor object through $conn$, set the SQL statement: Query the id data in the regione table where nome is $nome$, execute the SQL statement to get all the data, make sure that $conn$ is closed, and return the 0th element of the execution result.","def getRegioneId_sql ( conn , nome ) :
+	 c = conn . cursor ( )
+	 query = "" select id from regione where nome = : nome "" 
+	 res = c . execute ( query , { "" nome "" : nome } ) . fetchall ( )
+	 conn . close ( )
+	 return res [ 0 ]"
+"Generate origin code: Use $conn$ to execute SQL ( query the keyfile in the clients table based on $name$ and $system_uuid$ ) and get all the data. If the query result length is not 0, return the query result.","def download_key ( conn , name , system_uuid ) :
+	 longres = conn . execute ( "" select keyfile from clients where name = : name and system_uuid = : system_uuid "" , { "" name "" : name , "" system_uuid "" : system_uuid } ) . fetchall ( )
+	 if len ( longres ) == 0 :
+	 	 return longres"
+"Generate origin code: Execute SQL over a $conn$ connection ( query all fileval data in the pdf where the name of file is $Filename$ ) . Open fingerprint.csv using binary write mode ( wb ) . The for loop iterates through the query results, and write the query results to a CSV file on a row basis.","import csv
+def export_csv ( conn , Filename ) :
+	 res_File = conn . execute ( "" select fileval from pdf where Filename = : Filename "" , { "" Filename "" : Filename } ) . fetchall ( )
+	 f = open ( "" fingerprint.csv "" , "" wb "" )
+	 wrtr = csv . writer ( f )
+	 for row in res_File :
+	 	 wrtr . writerow ( row )"
+"Generate origin code: Use the Python expression to set up the SQL statement: Query the id in the $Department$ table through $name$. Execute SQL through $connection$ and get the first piece of data, print the query result and return.","from sqlalchemy . sql import select
+def reading ( connection , Department , name ) :
+	 find_it = select ( [ Department . c . id ] ) . where ( Department . c . name == name )
+	 rs = connection . execute ( find_it ) . fetchone ( )
+	 print ( rs )
+	 return rs"
+"Generate origin code: If $isbn$ is empty, return the rendered ""not_logged_in.html"" page; otherwise, use $conn$ to execute SQL ( query the reviewer column in the reviews table according to $isbn$ ) , get all the query results, use for loop traversal to get all the query results, and insert each piece of data into a list. Return the rendered ""write_review.html"" page, where the parameter isbn is $isbn$.","from flask import render_template
+def write_review ( conn , isbn ) :
+	 if isbn == None :
+	 	 return render_template ( "" not_logged_in.html "" )
+	 reviewers = conn . execute ( "" select reviewer from reviews where isbn = : isbn; "" , { "" isbn "" : isbn } ) . fetchall ( )
+	 u_lis = [ ]
+	 for user in reviewers :
+	 	 u_lis . append ( user )
+	 return render_template ( "" write_review.html "" , isbn = isbn )"
+"Generate origin code: Use the $conn$ connection to execute the SQL statement ( query all the columns in the books based on $isbn$ ) and get the first piece of data. If the execution result exists, use jsonify to return the execution result.","from flask import jsonify
+def bookapi ( conn , isbn ) :
+	 book = conn . execute ( "" select * from books where isbn = : isbn "" , { "" isbn "" : isbn } ) . fetchone ( )
+	 if book :
+	 	 return jsonify ( book )"
+"Generate origin code: Execute SQL via $conn$: Get all the job_name in jobzl via $company$, set the assertion to determine that the obtained result is not an empty 'list', print the obtained result and return.","def get_select ( conn , company ) :
+	 res = conn . execute ( "" select job_name from jobzl where company = : company "" , { "" company "" : company } ) . fetchall ( )
+	 assert res != [ ]
+	 print ( res )
+	 return res"
+"Generate origin code: Set the SQL statement based on $author$, get the year data in the books table, execute the SQL statement with the $conn$ connection, and convert the execution result to list. If the length of the list content is 0, render and return ""failure.html""; otherwise, render and return ""found.html"".","from flask import render_template
+def searchResult ( conn , author ) :
+	 sql = "" select year from books where author = : author "" 
+	 results = conn . execute ( sql , { "" author "" : author } )
+	 listFound = list ( results )
+	 if len ( listFound ) == 0 :
+	 	 return render_template ( "" failure.html "" )
+	 return render_template ( "" found.html "" )"
+"Generate origin code: Try to set up SQL ( query order_state column in order table based on $ORDER_ID$ ) , execute SQL based on $conn$ and get all the query results. Use for loop to iterate through all the obtained query results, insert each data into a list and return the list. If an exception is caught, print 'fail to get order_state'.","def select_state ( conn , ORDER_ID ) :
+	 try :
+	 	 get_state = "" select order_state from order where ORDER_ID = : ORDER_ID "" 
+	 	 states = conn . execute ( get_state , { "" ORDER_ID "" : ORDER_ID } ) . fetchall ( )
+	 	 return [ state for state in states ]
+	 except :
+	 	 print ( "" fail to get order_state "" )"
+Generate origin code: Use the Python expression to query the first 'name' in the $t$ table where the id is $ID$ through the $conn$ connection and return the query result.,"from sqlalchemy . sql import select
+def test_lobs_without_convert ( conn , t , ID ) :
+	 row = conn . execute ( select ( t . c . name ) . where ( t . c . id == ID ) ) . fetchone ( )
+	 return row"
+Generate origin code: Use $e$ to get the connection. Use the connection to execute the SQL ( query the weather_cond information in airport_weather based on $airport$ ) and get all the data. Store the 0th element of each item in the query results in the list and return.,"def get_inf ( e , airport ) :
+	 conn = e . connect ( )
+	 weat = conn . execute ( "" select weather_cond from airport_weather where airport = : airport "" , { "" airport "" : airport } ) . fetchall ( )
+	 return [ item [ 0 ] for item in weat ]"
+Generate origin code: Set SQL ( query the books table for review information where isbn is $isbn$ ) . Execute the SQL using $connection$ and get all the data. Return the rendered 'profile.html' and pass the query results to the reviews parameter.,"from flask import render_template
+def Search_book ( connection , isbn ) :
+	 querys = "" select review from books where isbn = : isbn "" 
+	 reviews = connection . execute ( querys , { "" isbn "" : isbn } ) . fetchall ( )
+	 return render_template ( "" profile.html "" , reviews = reviews )"
+"Generate origin code: Execute the SQL ( get the time column in the flights where password is $password$ ) with $conn$, get all the data, and finally return the rendered ""flights.html"" with the RES parameter as the result of the query.","from flask import render_template
+def flights ( conn , password ) :
+	 query = "" select time from flights where password = : password "" 
+	 res = conn . execute ( query , { "" password "" : password } ) . fetchall ( )
+	 return render_template ( "" flights.html "" , res = res )"
+"Generate origin code: Get the database connection from $testing$ in the with statement, execute the SQL statement ( query all columns in the table1 ) and get all the data. Convert each item in the query result into a tuple and return it as a list.","def search ( testing ) :
+	 with testing . connect ( ) as conn :
+	 	 results = conn . execute ( "" select * from table1 "" ) . fetchall ( )
+	 	 return [ tuple ( row ) for row in results ]"
+"Generate origin code: Try to use the Python expression to set up SQL statement: Get customer_id data in the $parent_plots$ table based on $plotname$, use $conn$ connection to execute SQL statement and get all the data. Return all query results. If exception occurs, return the empty list.","from sqlalchemy . sql import select
+def get_plot_customer ( conn , parent_plots , plotname ) :
+	 try :
+	 	 s = select ( parent_plots . c . customer_id ) . where ( parent_plots . c . plotname == plotname )
+	 	 customer_id = conn . execute ( s ) . fetchall ( )
+	 	 return customer_id
+	 except :
+	 	 return [ ]"
+"Generate origin code: Connect to the database through $db_engine$. Execute the SQL statement ( get all the columns in the customers table based on $username$ and $password$ ) and get the first piece of data to ensure that the database connection is closed. If the fetched data is empty, return None; otherwise, return the data corresponding to firstname and lastname in the query result.","def getCustomer ( db_engine , username , password ) :
+	 db_conn = db_engine . connect ( )
+	 res = db_conn . execute ( "" select * from customers where username = : username and password = : password "" , { "" username "" : username , "" password "" : password } ) . fetchone ( )
+	 db_conn . close ( )
+	 if res is None :
+	 	 return None
+	 else :
+	 	 return { "" firstname "" : res [ "" firstname "" ] , "" lastname "" : res [ "" lastname "" ] }"
+"Generate origin code: Set the SQL statement and the content is as follows: Query the duration data in the flights table where id is $id$, use the $conn$ connection to execute SQL, get all the data, convert each item of the query result into dict, store it as list, and return.","def select_duration ( conn , id ) :
+	 duration_sql = "" select duration from flights where id = : id "" 
+	 durations = conn . execute ( duration_sql , { "" id "" : id } ) . fetchall ( )
+	 return [ dict ( duration ) for duration in durations ]"
+"Generate origin code: Use the string matching method to set sql ( query the otu_id column in the Samples table according to $date_now$ ) , use $conn$ to execute SQL, use for loop to traverse all query results, store it as list and return.","def sampleJson ( conn , date_now ) :
+	 query = "" select otu_id from Samples where date_now=%s "" % date_now
+	 queryData = conn . execute ( query )
+	 queryList = [ each for each in queryData ]
+	 return queryList"
+"Generate origin code: If the request is GET, the rendered 'index.html' is returned. If the request method is POST, execute the SQL using $db$ ( querying user information in users where username is $logusername$ and whewre password is $logpassword$ ) and get the first data. Returns the rendered 'main.html', and pass the query result into the user parameter.","from flask import render_template , request
+def login ( db , logusername , logpassword ) :
+	 if request . method == "" GET "" :
+	 	 return render_template ( "" index.html "" )
+	 if request . method == "" POST "" :
+	 	 user = db . execute ( "" select user from users where username = : username and password = : password "" , { "" username "" : logusername , "" password "" : logpassword } ) . fetchone ( )
+	 	 return render_template ( "" main.html "" , user = user )"
+"Generate origin code: Step1: Executes the SQL statement through $db$: Query all the columns in the books table based on $book_id$ and get the first piece of data. Step2: Execute the SQL statement through $db$: Query all the columns in the 'reviews' table based on $book_id$ and get all the data. Render and return ""book.html"", where the book parameter is the query result of step1 and the 'reviews' parameter is the query result of step2.","from flask import render_template
+def book ( db , book_id ) :
+	 book = db . execute ( "" select * from books where id = : id "" , { "" id "" : book_id } ) . fetchone ( )
+	 reviews = db . execute ( "" select * from reviews where book_id = : id "" , { "" id "" : book_id } , ) . fetchall ( )
+	 return render_template ( "" book.html "" , book = book , reviews = reviews )"
+"Generate origin code: Set the SQL ( query all data in the data_hist with the string $code$ through the format ( ) function format string ) , execute the SQL statement with $conn$ to get all the data, make sure the database connection is closed and return the query results.","def reflesh_profit_peaks_botts ( conn , code ) :
+	 sql = "" select count(*) from data_hist where code={} "" . format ( code )
+	 infor = conn . execute ( sql ) . fetchall ( )
+	 conn . close ( )
+	 return infor"
+Generate origin code: Use $con$ to execute SQL: To query all rating data from the comments table and return the query results.,"def main ( con ) :
+	 res = con . execute ( "" select rating from comments "" ) . fetchall ( )
+	 return res"
+"Generate origin code: Execute SQL with $conn$ ( get all columns in sqlalchemy where word is $word$ ) and get all data, then set the assertion query result not to be of type list, print the query result, and return the query result.","def test_query_with_parameter ( conn , word ) :
+	 query = "" select * from sqlalchemy where word = : word "" 
+	 result = conn . execute ( query , { "" word "" : word } ) . fetchall ( )
+	 assert result != [ ]
+	 print ( result )
+	 return result"
+"Generate origin code: Set up SQL ( query the wallet_id column in the transaction_records table according to $id$ ) , use $conn$ to execute the SQL to query the first row of data, and return empty if no data is queried; otherwise, return the queried data.","def get_wallet_by_tx ( conn , id ) :
+	 find_tx_sql_str = "" select wallet_id from transaction_records where id = %s "" % ( id )
+	 data_query = conn . execute ( find_tx_sql_str , { "" id "" : id } ) . fetchone ( )
+	 if not data_query :
+	 	 return
+	 return data_query"
+"Generate origin code: Query the first 'name' in passengers table where flight_id is $flight_id$ through $conn$ , set assertion to determine that the length of the query result is not zero and return the query result.","def flight ( conn , flight_id ) :
+	 passenger = conn . execute ( "" select name from passengers where flight_id = : flight_id "" , { "" flight_id "" : flight_id } ) . fetchone ( )
+	 assert len ( passenger ) != 0
+	 return passenger"
+"Generate origin code: Set SQL ( query the origin in the flights table based on $id$ ) , use $conn$ to execute SQL and get all the query results. If the length of the query result is 0, print ""False"", otherwise print the query result.","def select_value ( conn , id ) :
+	 sql = "" select origin from flights where id = : id "" 
+	 origins = conn . execute ( sql , { "" id "" : id } ) . fetchall ( )
+	 if len ( origins ) == 0 :
+	 	 print ( "" False "" )
+	 return origins"
+"Generate origin code: Use $db$ to execute SQL ( get all the columns in the books table where book_name is $name$ and isbn is $id$ ) , get all the data, and finally return the rendered ""index.html"", where the books parameter is the query result.","from flask import render_template
+def get_books ( db , name , id ) :
+	 bs = db . execute ( "" select * from books where book_name = : name and isbn = : id "" , { "" name "" : name , "" id "" : id } ) . fetchall ( )
+	 return render_template ( "" index.html "" , books = bs )"
+"Generate origin code: Execute SQL via $conn$: Query the first id in the user table based on $login$. If the query result exists, return it.","def okUser ( conn , login ) :
+	 my_user = conn . execute ( "" select id from user where login = : login) "" , { "" login "" : login } ) . fetchone ( )
+	 if my_user :
+	 	 return my_user"
+"Generate origin code: Try to use $conn$ to execute SQL ( get all the columns in the db table according to values for $val$ ) and get the first row of data, return the query result. If an exception occurs during execution, print the exception and return False.","def get_commendation_view ( conn , val ) :
+	 try :
+	 	 result = conn . execute ( "" select * from db where values = : val "" , { "" val "" : val } ) . fetchone ( )
+	 	 return result
+	 except Exception as ex :
+	 	 print ( ex )
+	 	 return False"
+"Generate origin code: Use $conn$ to execute SQL according to the python expression ( query all columns in the $ProfilesData$ table where FK_groups is $gid$ ) and get the first piece of data. If the query result is empty, return None; otherwise, return the query result.","def getProfileImagingServer ( conn , ProfilesData , gid ) :
+	 pdata = conn . query ( ProfilesData ) . filter ( ProfilesData . c . FK_groups == gid ) . first ( )
+	 if pdata == None :
+	 	 return None
+	 return pdata"
+"Generate origin code: Use $conn$ to execute SQL ( get the description column in the Images table where imageID is $imageId$ ) , get all the data, and finally return the query result.","def find_Description ( conn , imageId ) :
+	 desc = conn . execute ( "" select description from Images where imageID = : imageId "" , { "" imageId "" : imageId } ) . fetchall ( )
+	 return desc"
+"Generate origin code: Use $tussl_test$ to get the database engine and connect to the database, then execute SQL ( get column 'a' in the basic table with d as $time$ ) and get all the data, and finally set the assertion that the length of the query result is not 0","import sqlalchemy
+def test_basic_execute ( tussl_test , time ) :
+	 engine = sqlalchemy . create_engine ( tussl_test )
+	 connection = engine . connect ( )
+	 data_sql = "" select a from basic where d = : time "" 
+	 results = connection . execute ( data_sql , { "" time "" : time } ) . fetchall ( )
+	 assert len ( results ) != 0"
+"Generate origin code: Use $db$ to execute SQL ( get the year column in the books table based on $isbn$, $title$ and $author$ ) . If the number of rows of the query result is 0, return the rendered ""error.html"", then obtain the first piece of data of the query result, and finally return the rendered ""results.html"", where the year parameter is the first data of the query result.","from flask import render_template
+def search_year ( db , isbn , title , author ) :
+	 query = "" select year from books where isbn = : isbn and title = : title and author = : author "" 
+	 rows = db . execute ( query , { "" isbn "" : isbn , "" title "" : title , "" author "" : author } )
+	 if rows . rowcount == 0 :
+	 	 return render_template ( "" error.html "" )
+	 year = rows . fetchone ( )
+	 return render_template ( "" results.html "" , year = year )"
+"Generate origin code: Execute the SQL statement with $con$: Query the largest duration in the flights table, get all the data, and return the obtained data.","def main ( con ) :
+	 m_duration = con . execute ( "" select max(duration) from flights "" ) . fetchall ( )
+	 return m_duration"
+"Generate origin code: Use $conn$ to query all names in users where id is $id$. Render and return 'success.html', where the sender parameter is the name attribute of the query result.","from flask import render_template
+def transactions ( conn , id ) :
+	 trans = conn . execute ( "" select name from users where id = : id "" , { "" id "" : id } ) . fetchall ( )
+	 return render_template ( "" success.html "" , sender = trans . name )"
+"Generate origin code: Use $db$ to execute SQL based on the python expression ( get the origin column in the $flights$ table where destination is $dest$ and duration is $dur$ ) and get all the data. Finally, use for loop to convert each item of the query result to a list type and return.","def get_origin ( db , flights , dest , dur ) :
+	 query = flights . select ( [ flights . c . origin ] ) . where ( flights . c . destination == dest and flights . c . duration == dur )
+	 origins = db . execute ( query ) . fetchall ( )
+	 return [ o for o in origins ]"
+"Generate origin code: Try to use $connection$ to use the Python expression to set SQL: To get the categoryID data in $categories_table$ according to $name$, execute SQL to get the first piece of data and return. If Exception occurs, print the exception message and return.","from sqlalchemy . sql import select
+def get_category_by_name ( connection , categories_table , name ) :
+	 try :
+	 	 s = select ( [ categories_table . c . categoryID ] ) . where ( categories_table . c . name == name )
+	 	 result = connection . execute ( s ) . fetchone ( )
+	 	 return result
+	 except Exception as e :
+	 	 print ( e )
+	 	 return"
+"Generate origin code: Use $dbcur$ to execute SQL ( query the number of all columns in the information_schema table based on $table_name$ ) and return False, if the 0th element of the first row of data obtained is not equal to 1; otherwise, return the 0th element of the first row of data.","def checkTable ( dbcur , table_name ) :
+	 res = dbcur . execute ( "" select COUNT(*) from information_schema where table_name = : table_name "" , { "" table_name "" : table_name } )
+	 if not res . fetchone ( ) [ 0 ] == 1 :
+	 	 return False
+	 else :
+	 	 return res . fetchone ( ) [ 0 ]"
+"Generate origin code: Get the database engine using $test$, execute the SQL ( find all columns of $statuses$ ) through the database engine, get all the data, and print all the data using the for loop.","from sqlalchemy . sql import select
+from sqlalchemy import create_engine
+def select_run ( test , statuses ) :
+	 engine = create_engine ( test )
+	 status = engine . execute ( select ( [ statuses ] ) ) . fetchall ( )
+	 for row in status :
+	 	 print ( row )"
+"Generate origin code: Set the SQL statement: Query all columns in the stocks_hist table with 'date' of $date$, and execute SQL to get all the data via $conn_hist$. If the obtained data is not empty, return.","def get_sotcks_hist ( conn_hist , date ) :
+	 rawsql = "" select * from stocks_hist where date = : date "" 
+	 res = conn_hist . execute ( rawsql , date = date ) . fetchall ( )
+	 if res :
+	 	 return res"
+Generate origin code: Use $conn$ to execute SQL ( query the first row of data in the osm column of the scripts table based on $functions$ ) and return the 0th element of the data.,"def osmaxx_functions ( conn , functions ) :
+	 res = conn . execute ( "" select osm from scripts where functions = : functions "" , { "" functions "" : functions } ) . fetchone ( )
+	 return res [ 0 ]"
+"Generate origin code: Execute SQL statement through $conn$: Query statistical values of all columns in the apbd table based on $tahun$, $kode$ and $ref_kode$. Get the first piece of data and return the query results.","def data_found ( conn , tahun , kode , ref_kode ) :
+	 data = conn . execute ( "" select COUNT(*) from apbd where tahun = : tahun and kode = : kode and ref_kode = : ref_kode "" , { "" tahun "" : tahun , "" kode "" : kode , "" ref_kode "" : ref_kode } ) . fetchone ( )
+	 return data"
+"Generate origin code: Get the database engine and establish a connection through $postgresql$. Execute the SQL statement ( query the message column in the articles table according to $title$ ) , get all the data, close the connection. If the execution result is greater than 0, return the rendered ""articles.html"" page, where the parameter articles is the query result.","from flask import render_template
+from sqlalchemy import create_engine
+def articles ( postgresql , title ) :
+	 eng = create_engine ( postgresql )
+	 con = eng . connect ( )
+	 result = con . execute ( "" select message from articles where title = : title "" , { "" title "" : title } ) . fetchall ( )
+	 con . close ( )
+	 if result > 0 :
+	 	 return render_template ( "" articles.html "" , articles = result )"
+"Generate origin code: Set up SQL ( query all the information in the usersdata table based on $startDate$ ) , execute SQL with $conn$ and get all the query results. Use for loop to convert each query result to dict, and store it in list and return.","def select_value ( conn , startDate ) :
+	 query_sql = "" select * from usersdata where startDate = : startDate "" 
+	 data = conn . execute ( query_sql , { "" startDate "" : startDate } ) . fetchall ( )
+	 return [ dict ( d ) for d in data ]"
+"Generate origin code: Execute the SQL ( get all the columns in the books where p1_index is $p1_index$ ) with $conn$ and get all the data, then return the rendered ""p1_index.html"" with the books parameter as the result of the query.","from flask import render_template
+def books ( conn , p1_index ) :
+	 query = "" select * from books where p1_index = : p1_index "" 
+	 res = conn . execute ( query , { "" p1_index "" : p1_index } ) . fetchall ( )
+	 return render_template ( "" p1_index.html "" , books = res )"
+Generate origin code: Execute SQL through $connection$ ( get the gid column in the pg_prepared_xacts table ) and get all the data. Then print the query results. Use for loop to store the 0th element of each item of the query results as list and finally return the list.,"def do_recover_twophase ( connection ) :
+	 resultset = connection . execute ( "" select gid from pg_prepared_xacts "" ) . fetchall ( )
+	 print ( resultset )
+	 return [ row [ 0 ] for row in resultset ]"
+"Generate origin code: Execute SQL via $conn$ connection ( query all columns in books with isbn of $isbn_code$ ) to get the first piece of data, and return 0 if the data is empty; otherwise, returm the execution result of the dictionary type.","def api ( conn , isbn_code ) :
+	 data = conn . execute ( "" select * from books isbn = : isbn "" , { "" isbn "" : isbn_code } ) . fetchone ( )
+	 if data == None :
+	 	 return 0
+	 else :
+	 	 return dict ( data )"
+"Generate origin code: In ORM, try to use $session$ to query the first piece of data in the $Comment$ table that the id is $c_id$ and return the query result. If an exception occurs, use 'raise' to throw the exception. Finally, make sure that $session$ is turned off.","def process_comment ( Comment , session , c_id ) :
+	 try :
+	 	 matching_comment = session . query ( Comment ) . filter_by ( Comment . id == c_id , ) . first ( )
+	 	 return matching_comment
+	 except :
+	 	 raise
+	 finally :
+	 	 session . close ( )"
+Generate origin code: Set up an SQL statement: Query the LastUpdated data in the boxes table by $boxID$ and execute SQL to query all data via $conn$. For loop iterates through the query results and prints the 0th element of the query results.,"def getLastUpdatedDate ( boxID , conn ) :
+	 sql = "" select LastUpdated from boxes where boxID = : boxID "" 
+	 result = conn . execute ( sql , { "" boxID "" : boxID } ) . fetchall ( )
+	 for row in result :
+	 	 print ( row [ 0 ] )"
+"Generate origin code: Try to set up SQL ( get all columns in vw_muertes_estado based on $data_year$ ) and get all the data by $conn$ execution. Then store the query result as DataFrame format. After that convert the query result to dictionary type with 'records' as orient parameter. Finally use jsonify to process the dictionary content and return. If there is an exception in the execution, print the exception string and finally make sure that $conn$ is closed.","import pandas as pd
+from flask import jsonify
+def tell_data ( conn , data_year ) :
+	 try :
+	 	 sql_select_Query = "" select * from vw_muertes_estado where data_year = : data_year "" 
+	 	 res = conn . execute ( sql_select_Query , { "" data_year "" : data_year } ) . fetchall ( )
+	 	 result_df = pd . DataFrame ( res )
+	 	 df = result_df . to_dict ( orient = "" records "" )
+	 	 return jsonify ( df )
+	 except Exception as e :
+	 	 print ( str ( e ) )
+	 finally :
+	 	 conn . close ( )"
+"Generate origin code: If $schema$ is empty, throw and execute an Exception, whose parameter is ""fail""; otherwise, obtain the database engine through $connection_string$. Use the with statement to establish a connection. Use the format string matching method to set the sql statement ( query all columns in the 'pg_tables' table based on the condition that schemaname is $schema$ ) , execute the SQL statement, get all the data, and return the query results.","import sqlalchemy
+def get_page ( connection_string , schema ) :
+	 if schema == "" "" :
+	 	 raise Exception ( "" fail "" )
+	 engine = sqlalchemy . create_engine ( connection_string )
+	 with engine . connect ( ) as conn :
+	 	 sqlString = "" select * from pg_tables where schemaname = : {} "" . format ( schema )
+	 	 ret = conn . execute ( sqlString ) . fetchall ( )
+	 	 return ret"
+"Generate origin code: Try to use $conn$ to execute SQL ( query sponsor in user based on $plan$ ) and get all the data and return the query results. Finally, make sure the connection is closed.","def basic_fixture ( conn , plan ) :
+	 try :
+	 	 sponsor = conn . execute ( "" select sponsor from user where plan = : plan "" , { "" plan "" : plan } ) . fetchall ( )
+	 	 return sponsor
+	 finally :
+	 	 conn . close ( )"
+"Generate origin code: Creating a database engine using $oracle$. Start a connection with the with statement, and use the connection to execute the SQL ( querying the team_name_abbr in the team based on $name$ ) and get the first data. Print element 0 in the query result.","from sqlalchemy import create_engine
+def test9 ( oracle , name ) :
+	 engine = create_engine ( oracle )
+	 with engine . begin ( ) as conn :
+	 	 res = conn . execute ( "" select team_name_abbr from team where name = : name "" , { "" name "" : name } ) . fetchone ( )
+	 print ( res [ 0 ] )"
+"Generate origin code: Execute the SQL using $db$ ( get the book column in the tableh where linkValue is $link$ ) and get all the data, return the query results if the length of the query results is not 0.","def initiateLinkSearch ( db , link ) :
+	 s = db . execute ( "" select book from tableh where linkValue = : link "" , { "" link "" : link } )
+	 links = s . fetchall ( )
+	 if ( len ( links ) != 0 ) :
+	 	 return links"
+"Generate origin code: Set SQL ( query the lastname column in the User table based on $firstname$ ) , use $conn$ to execute SQL and get all the query results. Set assertion to determine whether the query results are empty, and return the query results.","def testBulk ( conn , firstname ) :
+	 sql = "" select lastname from User where firstname = : firstname "" 
+	 results = conn . execute ( sql , { "" firstname "" : firstname } ) . fetchall ( )
+	 assert results != [ ]
+	 return results"
+"Generate origin code: Set the SQL statement: Query all the columns in the data table according to $date$, use $conn$ to execute SQL to get all the data, and return the 0th element of the execution result.","def get_code_by_date ( conn , date ) :
+	 sql_data = "" select * from data where date = : date "" 
+	 records = conn . execute ( sql_data , { "" date "" : date } ) . fetchall ( )
+	 return records [ 0 ]"
+"Generate origin code: If use $conn$ to execute SQL ( get all the columns in users based on $username$ ) and the result of the number of rows is 0, return rendered ""message_layout.html"" and pass ""Not Registered"" into the message parameter. Otherwise return rendered ""message_layout.html"", and pass ""Succesfuly Logged In!"" into the message parameter.","from flask import render_template
+def login ( username , conn ) :
+	 if conn . execute ( "" select * from users where username = : username "" , { "" username "" : username } ) . rowcount == 0 :
+	 	 return render_template ( "" message_layout.html "" , message = "" Not Registered! "" )
+	 else :
+	 	 return render_template ( "" message_layout.html "" , message = "" Succesfuly Logged In! "" )"
+"Generate origin code: Set the SQL with the following content: Get the salary data in the jobs table based on $company$, execute the SQL to get all the data via $conn$, and return all the obtained data.","def process_item ( conn , company ) :
+	 sql = "" select salary from jobs where company = : company "" 
+	 data = conn . execute ( sql , { "" company "" : company } ) . fetchall ( )
+	 return data"
+"Generate origin code: Execute the SQL ( get all the columns in the test_frame3_legacy where id is $id$ ) with $conn$, get all the data, then close the $conn$ connection, and return the query results.","def test_sql_open_close ( conn , id ) :
+	 sql = "" select * from test_frame3_legacy where id = : id "" 
+	 res = conn . execute ( sql , { "" id "" : id } ) . fetchall ( )
+	 conn . close ( )
+	 return res"
+"Generate origin code: Create a database engine and establish a connection via $db_name$. Execute SQL: Query the user information in the db_name table based on $password$, get the first piece of information, and return the obtained information.","from sqlalchemy import create_engine
+def getitems ( db_name , password ) :
+	 engine = create_engine ( db_name )
+	 connection = engine . connect ( )
+	 items = connection . execute ( "" select user from db_name where password = : password "" , { "" password "" : password } ) . fetchone ( )
+	 return items"
+"Generate origin code: Execute the SQL statement ( query all columns in the favorites table based on $name$ and $city$ ) through $conn$, get all the data and convert each item into dict and store it as list and return it. If there is an exception, then print ""Error"".","def query_favorites ( conn , name , city ) :
+	 try :
+	 	 query = conn . execute ( "" select * from favorites where name = : name and city = : city "" , { "" name "" : name , "" city "" : city } ) . fetchall ( )
+	 	 return [ dict ( row ) for row in query ]
+	 except :
+	 	 print ( "" Error "" )"
+"Generate origin code: Connect to the database through $engine$. Execute SQL: Query the maximum 'price' in the crypto table and get the first piece of data. Convert each item of the query result to dict, store as list and return.","def stations ( engine ) :
+	 conn = engine . connect ( )
+	 results = conn . execute ( "" select max(price) from crypto "" ) . fetchone ( )
+	 items = [ dict ( r ) for r in results ]
+	 return items"
+"Generate origin code: Set SQL based on the python expression ( query all columns in the $Line$ table based on $line_cd$ ) . Execute SQL through $conn$, get all the data, use for loop to traverse each query result, store it as list, and finally return the list.","from sqlalchemy . sql import select
+def join_data ( conn , Line , line_cd ) :
+	 s = select ( Line ) . where ( Line . c . line_cd == line_cd )
+	 moe = conn . execute ( s ) . fetchall ( )
+	 known_line_cd = [ ]
+	 for i in moe :
+	 	 known_line_cd . append ( i )
+	 return known_line_cd"
+"Generate origin code: Set up SQL ( get all columns in 'drinkers' based on $rawdata$ ) , try to execute with $conn$ and get all the data. Return the query result, and if an exception occurs during execution, return False.","def write_local_db ( conn , rawdata ) :
+	 query = "" select * from drinkers where rawdata = : rawdata "" 
+	 try :
+	 	 rs = conn . execute ( query , { "" rawdata "" : rawdata } ) . fetchall ( )
+	 	 return rs
+	 except Exception as e :
+	 	 return False"
+"Generate origin code: Step 1: Use $db$ to execute SQL ( query all columns in userss based on $id$ ) and get the first piece of data. Setp 2: Use $db$ to execute SQL ( query all columns in userss ) and get all the data. Pass the query result of step 1 to the user parameter, and the query result of step 2 to the users parameter, return and render the ""profile.html"" page.","from flask import render_template
+def profile ( db , id ) :
+	 user = db . execute ( "" select * from userss where id = : id "" , { "" id "" : id } ) . fetchone ( )
+	 users = db . execute ( "" select * from userss; "" ) . fetchall ( )
+	 return render_template ( "" profile.html "" , user = user , users = users )"
+"Generate origin code: Get the database engine by $DB_DOMAIN$ with 'echo' parameter as False and establish a connection. Set SQL statement ( query all columns in test0 table based on $value$ ) , execute sql, get all the data, and return the query result.","import sqlalchemy
+def test0_db ( DB_DOMAIN , value ) :
+	 create_db_engine = sqlalchemy . create_engine ( DB_DOMAIN , echo = False )
+	 conn = create_db_engine . connect ( )
+	 sql = "" select * from test0 where value = : value "" 
+	 results = conn . execute ( sql , { "" value "" : value } ) . fetchall ( )
+	 return results"
+"Generate origin code: Execute the SQL ( get the type column in the table where engine is $engine$ ) using $db$, get all the data, and return the query results.","def test_to_sql ( db , engine ) :
+	 rows = db . execute ( "" select type from table where engine = : engine "" , { "" engine "" : engine } ) . fetchall ( )
+	 return rows"
+"Generate origin code: Set up SQL ( query all the information in the flights table based on $id$ ) , use $conn$ to execute SQL and get the first piece of data. If the query result is empty, return the rendered ""error.html"" page with 'message' as ""No such flight."" Otherwise, return the rendered ""flight.html"", and the flight parameter is the query result.","from flask import render_template
+def flight ( conn , id ) :
+	 flight_sql = "" select * from flights where id = : id "" 
+	 flight = conn . execute ( flight_sql , { "" id "" : id } ) . fetchone ( )
+	 if flight is None :
+	 	 return render_template ( "" error.html "" , message = "" No such flight. "" )
+	 else :
+	 	 return render_template ( "" flight.html "" , flight = flight )"
+Generate origin code: Use the with statement to connect to the database according to $engine$. Execute the SQL statement ( query all customer_name and customer_des information in the customer table ) and return the query result.,"def query_caching ( engine ) :
+	 with engine . begin ( ) as conn :
+	 	 res = conn . execute ( "" select customer_name, customer_des from customer "" ) . fetchall ( )
+	 	 return res"
+"Generate origin code: Try to use $conn$ to execute SQL ( get the ID and DNI columns in the users where id is $dni$ ) and get the first data, then return the query results and finally make sure the $conn$ connection is closed.","def users ( conn , dni ) :
+	 try :
+	 	 cur = conn . execute ( "" select id, dni from users where id = : dni "" , { "" dni "" : dni } ) . fetchone ( )
+	 	 return cur
+	 finally :
+	 	 conn . close ( )"
+"Generate origin code: Execute the SQL with $conn$ ( get the id column in the name where staff_position.id is $id$ and name.id is $id $ ) and get the first data, then return the query results.","def where_clause_fn ( conn , id ) :
+	 stmt = "" select id from name where staff_position.id = : id, name.id = : id)) "" 
+	 res = conn . execute ( stmt , { "" id "" : id } ) . fetchone ( )
+	 return res"
+"Generate origin code: Try to use the Python expression to execute the SQL statement through the $conn$ connection: Query all the contents of the $ServiceV4$ table where id is $pk_id$ and return the query results. If there is an Exception, use 'raise' to throw an exception based on the error message.","def update_service_rows_by_ids ( conn , ServiceV4 , pk_id ) :
+	 try :
+	 	 model_obj = conn . query ( ServiceV4 ) . filter ( ServiceV4 . id == pk_id ) . fetchall ( )
+	 	 return model_obj
+	 except Exception as e :
+	 	 raise e"
+"Generate origin code: Use 'with' statement to connect to the database based on $engine$. Set up SQL ( query all columns in the MasterSells table based on Price $max_price$ ) , execute SQL and get all the query results. Use for loop to convert each query result to dict, and store in list. Use for loop to convert the 'Price' field in the query result to float format. Finally, return the list.","def filter_beers ( engine , max_price ) :
+	 with engine . connect ( ) as con :
+	 	 query = "" select * from MasterSells where Price = : max_price "" 
+	 	 rs = con . execute ( query , { "" max_price "" : max_price } ) . fetchall ( )
+	 	 results = [ dict ( row ) for row in rs ]
+	 	 for r in results :
+	 	 	 r [ "" Price "" ] = float ( r [ "" Price "" ] )
+	 	 return results"
+"Generate origin code: Use $conn$ to execute SQL ( get the 'the_class' column in the context table according to $id$ ) and get the first piece of data. If the query result is true, return the query result; otherwise, return None.","def get_class ( conn , id ) :
+	 row = conn . execute ( "" select the_class from context where id = : id "" , { "" id "" : id } ) . fetchone ( )
+	 return row if row else None"
+"Generate origin code: If the request module sends request as post, use $conn$ to create cursor object, execute SQL statement by cursor: Query the first piece of owner data in the houses table based on $id$. Close the cursor, render and return ""house.html"", where the owner parameter is the query result; otherwise use redirect to return the 'homepage' spliced by url_for.","from flask import render_template , request , redirect , url_for
+def house ( conn , id ) :
+	 if request . method == "" POST "" :
+	 	 cursor = conn . cursor ( )
+	 	 rs = cursor . execute ( "" select owner from houses where id = : id "" , { "" id "" : id } ) . fetchone ( )
+	 	 cursor . close ( )
+	 	 return render_template ( "" house.html "" , owner = rs )
+	 else :
+	 	 return redirect ( url_for ( "" homepage "" ) )"
+"Generate origin code: Use $conn$ to execute the SQL statement ( query all the columns in the flights table based on $id$ ) , get all the data, render and return ""index.html"", where the flights parameter is the query result.","from flask import render_template
+def index ( conn , id ) :
+	 info = conn . execute ( "" select * from flights where id = : id "" , { "" id "" : id } ) . fetchall ( )
+	 return render_template ( "" index.html "" , flights = info )"
+Generate origin code: Establish database engine based on $db_address$ and set echo parameter to False. Get a connection based on engine. Execute SQL ( query all columns in winlotto table based on $win_id$ ) and get query results. Close the link and return the query results.,"from sqlalchemy import create_engine
+def winlotto_sel ( db_address , win_id ) :
+	 engine = create_engine ( db_address , echo = False )
+	 connector = engine . connect ( )
+	 winlotto = connector . execute ( "" select * from winlotto where win_id = : win_id "" , { "" win_id "" : win_id } ) . fetchall ( )
+	 connector . close ( )
+	 return winlotto"
+Generate origin code: Connect to the database with $db$. Execute the SQL statement ( query the inf in the users where based on $id_tu$ ) and return all query results.,"def test_flush ( db , id_tu ) :
+	 c = db . connect ( )
+	 flush = c . execute ( "" select inf from users where id_tu = : id_tu "" , { "" id_tu "" : id_tu } ) . fetchall ( )
+	 return flush"
+"Generate origin code: Use $testing$ to establish a connection, execute SQL ( query all columns in the deadlock_users table based on $user_id$ ) , get all the query results, close the connection, and return the query results.","def test_rollback_deadlock ( testing , user_id ) :
+	 conn1 = testing . connect ( )
+	 res = conn1 . execute ( "" select * from deadlock_users where user_id = : user_id "" , { "" user_id "" : user_id } ) . fetchall ( )
+	 conn1 . close ( )
+	 return res"
+"Generate origin code: Use $conn$ to query all the columns in the flights table, get all the data, render and return ""index.html"", where the flight parameter is the query result.","from flask import render_template
+def index ( conn ) :
+	 flights = conn . execute ( "" select * from flights "" ) . fetchall ( )
+	 return render_template ( "" index.html "" , flights = flights )"
+Generate origin code: Execute the SQL statement ( get all the data in $Contact$ where id is $id$ ) using ORM over the $conn$ connection to print all the query results.,"def get_contacty_by_id ( conn , Contact , id ) :
+	 values = conn . query ( Contact ) . filter ( Contact . id == id ) . all ( )
+	 print ( values )"
+"Generate origin code: Use Python expression to set up SQL statement ( get p in $table$ table based on $q$ ) , execute SQL by $conn$ to get all the data and return.","from sqlalchemy . sql import select
+def test_append_correlation ( conn , table , q ) :
+	 inner = select ( [ table . c . p ] ) . where ( table . c . q == q )
+	 res = conn . execute ( inner ) . fetchall ( )
+	 return res"
+"Generate origin code: Use the with statement to connect the database according to $engine$. Execute the SQL statement ( get the statistics of all the columns in the Bills table based on $type$ ) , get all the data, convert each item of the query result to dict, store it as list and return.","def get_data ( engine , type ) :
+	 with engine . connect ( ) as con :
+	 	 rs = con . execute ( "" select COUNT(*) from Bills where type = : type "" , { "" type "" : type } ) . fetchall ( )
+	 	 results = [ dict ( row ) for row in rs ]
+	 	 return results"
+"Generate origin code: Try to set the SQL statement with the Python expression ( query the cookie_id in the $cookies$ table through $quantity$ ) , use the $conn$ connection to execute SQL, get all the data, and return the obtained data. If there is an Exception, print exception message.","from sqlalchemy . sql import select
+def ship_it ( conn , cookies , quantity ) :
+	 try :
+	 	 sql = select ( [ cookies . c . cookie_id ] ) . where ( cookies . c . quantity == quantity )
+	 	 cookies_to_ship = conn . execute ( sql ) . fetchall ( )
+	 	 return cookies_to_ship
+	 except Exception as e :
+	 	 print ( e )"
+Generate origin code: Use $conn$ to execute SQL ( get the name column in the Campground ) to get all the data and print each item in the query result using the for loop.,"def search_name ( conn ) :
+	 cities = conn . execute ( "" select name from Campground "" ) . fetchall ( )
+	 for c in cities :
+	 	 print ( c )"
+"Generate origin code: Open the $input_file$ file with the with statement, read the file, execute the 'next' command, traverse the title in the file and connect the database according to $db$. Execute SQL ( query all columns in the books table according to title ) , get all the query results and print them.","import csv
+def read_csv ( db , input_file ) :
+	 with open ( input_file ) as file :
+	 	 reader = csv . reader ( file )
+	 	 next ( reader )
+	 	 for title in reader :
+	 	 	 res = db . execute ( "" select * from books where title = : title "" , { "" title "" : title } ) . fetchall ( )
+	 	 	 print ( res )"
+"Generate origin code: Use $conn$ to execute the SQL statement ( query all id data in the flights table ) , use for loop traversal to query the results and print, set assertions to determine that the length of the returned result is greater than 0.","def main ( conn ) :
+	 flights = conn . execute ( "" select id from flights "" ) . fetchall ( )
+	 for flight in flights :
+	 	 print ( flight )
+	 assert len ( flights ) > 0"
+Generate origin code: Try to use $conn$ to execute SQL ( query all ids in the localtable where the id of parent is $parent_id$ ) and return all results. Finally make sure $conn$ is off.,"def test_reflect_alt_owner_synonyms ( conn , parent_id ) :
+	 try :
+	 	 texts = conn . execute ( "" select id from localtable where parent_id = : parent_id "" , { "" parent_id "" : parent_id } ) . fetchall ( )
+	 	 return texts
+	 finally :
+	 	 conn . close ( )"
+"Generate origin code: Print $intcol$, execute SQL with $conn$ ( get the numericcol column in t1 where intcol is $intcol$ ) , get all the data and return.","def test_numerics ( conn , intcol ) :
+	 print ( intcol )
+	 sql = "" select numericcol from t1 where intcol = : intcol "" 
+	 results = conn . execute ( sql , { "" intcol "" : intcol } ) . fetchall ( )
+	 return results"
+Generate origin code: Set SQL: query the id information in the item_info table where name is $keywords$. Execute the SQL using $session$ and get all the data. Close $session$ and return each item in the query result as dict.,"def get_keywords ( session , keywords ) :
+	 sql = "" select id from item_info where name = : keywords "" 
+	 ret = session . execute ( sql , { "" keywords "" : keywords } ) . fetchall ( )
+	 session . close ( )
+	 return [ dict ( i ) for i in ret ]"
+"Generate origin code: Use $connect_str$ to get the database engine, where the echo parameter is False. Use sessionmaker ( ) to create a configured Session class and bind the database engine. Instantiate Session, then set SQL statement: Query names data in tables through $schema$, execute SQL to get all the data. Convert each item of the query results into dict and store it as list and return it.","from sqlalchemy import create_engine
+from sqlalchemy . orm . session import sessionmaker
+def get_all_table_names ( connect_str , schema ) :
+	 engine = create_engine ( connect_str , echo = False )
+	 session = sessionmaker ( bind = engine )
+	 ss = session ( )
+	 query = "" select names from tables where schema = : schema "" 
+	 rs = ss . execute ( query , { "" schema "" : schema } ) . fetchall ( )
+	 return [ dict ( row ) for row in rs ]"
+"Generate origin code: Create the database engine from $proxy$ and set the echo parameter to False. Create a connection using the engine. Set the SQL ( queries for the hostname in the Table where IP is $ip$, id is $id$, and location is $location$ ) . Try Out SQL with $conn$ and get the first data and return the query results. If an exception occurs, the information for the specific exception is printed.","from sqlalchemy import create_engine
+def main ( proxy , ip , id , location ) :
+	 engine = create_engine ( proxy , echo = False )
+	 conn = engine . connect ( )
+	 sql = "" select hostname from Table where ip = : ip and id = : id and location = : location "" 
+	 try :
+	 	 result = conn . execute ( sql , { "" ip "" : ip , "" id "" : id , "" location "" : location } ) . fetchone ( )
+	 	 return result
+	 except Exception as e :
+	 	 print ( e )"
+"Generate origin code: Open the""books.csv"" and use reader to process the file. For each item of data in the file, execute the SQL using $db$ ( query the year in the books table where isbn is the data in the file ) and store the first query result in the list. Finally, return the whole list.","import csv
+def get_year ( db ) :
+	 f = open ( "" books.csv "" )
+	 reader = csv . reader ( f )
+	 res_list = [ ]
+	 for isbn in reader :
+	 	 res = db . execute ( "" select year from books where isbn = : isbn "" , { "" isbn "" : isbn } ) . fetchone ( )
+	 	 res_list . append ( res )
+	 return res_list"
+"Generate origin code: Connect to the database via $engine$, try to execute the SQL ( get all the columns in the database based on $name$ ) , get all the data and then return the query result.If an exception occurs during the execution, print the exception print and finally make sure the connection is closed.","def initialize ( engine , name ) :
+	 conn = engine . connect ( )
+	 try :
+	 	 res = conn . execute ( "" select * from database where name = : name "" , { "" name "" : name } ) . fetchall ( )
+	 	 return res
+	 except Exception as ex :
+	 	 print ( ex )
+	 finally :
+	 	 conn . close ( )"
+"Generate origin code: Use $conn$ to query all the fname in the tuser table whose pwd is $pwd$, print the query result, and return the query result if the length of the query result is greater than 0.","def query ( conn , pwd ) :
+	 res = conn . execute ( "" select fname from tuser where pwd:pwd "" , { "" pwd "" : pwd } ) . fetchall ( )
+	 print ( res )
+	 if len ( res ) > 0 :
+	 	 return res"
+"Generate origin code: If the request module sends the request in a POST method, try to use the $conn$ connection to execute the SQL statement ( get the first user_name in the Reviews table based on $user$ and $isbn$ ) , render and return ""bookinfo.html"", where the review parameter is the obtained data. If an exception occurs, return False.","from flask import render_template , request
+def book_info ( conn , user , isbn ) :
+	 if request . method == "" POST "" :
+	 	 try :
+	 	 	 review = conn . execute ( "" select user_name from Reviews where user_name = : user and isbn = : isbn "" , { "" user "" : user , "" isbn "" : isbn } ) . fetchone ( )
+	 	 	 return render_template ( "" bookinfo.html "" , review = review )
+	 	 except :
+	 	 	 return False"
+"Generate origin code: Use $conn$ to execute SQL ( query the nlast column in the stock_fund_holdings table based on $code$ and $date$ ) , get all the data, and use $conn$ to submit it. And output the query results.","def fetch_fund_holdings ( conn , code , date ) :
+	 cur = conn . execute ( "" select nlast from stock_fund_holdings where code = : code and date = : date "" , { "" code "" : code , "" date "" : date } ) . fetchall ( )
+	 conn . commit ( )
+	 print ( cur )"
+"Generate origin code: According to the python expression, execute SQL with $conn$ ( Get the data for the count limit of $count$ in the $table$ ) and get all the data, then print the query results and return the query results.","def databaseOutput ( conn , table , count ) :
+	 tableOutput = conn . execute ( table . select ( ) . limit ( count ) ) . fetchall ( )
+	 print ( tableOutput )
+	 return tableOutput"
+"Generate origin code: Set SQL ( query the status column in 'orders' table based on the $customerid$ which is converted to a string ) , use $conn$ to execute the SQL and get all the query results, and return the results of the execution statement.","def setOrderStatusPaid ( conn , customerid ) :
+	 query = "" select status from orders where customerid = "" + str ( customerid )
+	 status = conn . execute ( query , { "" customerid "" : customerid } ) . fetchall ( )
+	 return status"
+"Generate origin code: Execute the SQL ( get the customerid column in the customers table processed by the count method where the name of user is $username$ ) with $conn$, get all the data, then use the for loop to convert each item of the query result to a list type, and finally return the list content.","def getNumberUsersWithUsername ( conn , username ) :
+	 db_result = conn . execute ( "" select count(customerid) from customers where username = : username "" , { "" username "" : username } ) . fetchall ( )
+	 res = [ item for item in db_result ]
+	 return res"
+"Generate origin code: Use $engine$ to connect the database and execute SQL ( get the UID column in the USER_LIST table whose LID is $lid$ ) , get all the data, close the connection, and finally return the query result.","def get_userid ( engine , lid ) :
+	 conn = engine . connect ( )
+	 uids = conn . execute ( "" select UID from USER_LIST where LID=lid "" , { "" lid "" : lid } ) . fetchall ( )
+	 conn . close ( )
+	 return uids"
+"Generate origin code: Set the SQL ( query all autoload in $devices$ where metadata is $metadata$ ) , execute the SQL using the $connection$ and fetch the data.","def openDB ( connection , metadata ) :
+	 sql = "" select autoload from devices where metadata= "" + metadata
+	 inforauto = connection . execute ( sql ) . fetchall ( )
+	 return inforauto"
+"Generate origin code: If the request module sends the request as GET, render and return ""register.html"". Otherwise execute the SQL ( query all columns in users where the state of login is $login_state$ ) over the $conn$ connection and get the first data, return the obtained data.","from flask import render_template , request
+def register ( conn , login_state ) :
+	 if request . method == "" GET "" :
+	 	 return render_template ( "" register.html "" )
+	 else :
+	 	 information = conn . execute ( "" select * from users where login_state = : login_state "" , { "" login_state "" : login_state } ) . fetchone ( )
+	 	 return information"
+"Generate origin code: Execute SQL with $db$ ( query all columns in the usuarios table according to $id_user$ ) , get the first row of data, return the rendered ""main.html"", and set the parameter name to the 0th element of the query result.","from flask import render_template
+def login ( db , id_user ) :
+	 user = db . execute ( "" select * from usuarios where id_user = : id_user "" , { "" id_user "" : id_user } ) . fetchone ( )
+	 user_name = user [ 0 ]
+	 return render_template ( "" main.html "" , name = user_name )"
+"Generate origin code: Try to execute the SQL statement using the $conn$ connection: query all the columns in the photos where time_oj is $time_oj$ and get all the data. Store the 0th element of each item of the query result as a list and return it. If an Exception occurs during execution, the Exception information is printed.","def empty_query ( conn , time_oj ) :
+	 try :
+	 	 infor = conn . execute ( "" select * from photos where time_oj = : time_oj "" , { "" time_oj "" : time_oj } ) . fetchall ( )
+	 	 return [ item [ 0 ] for item in infor ]
+	 except Exception as e :
+	 	 print ( e )"
+Generate origin code: Use $testing$ to get the database connection. Use the connection to execute SQL ( query all columns in the query_users table ) and get all the data. Close the connection and return the query results.,"def test_close2 ( testing ) :
+	 connection = testing . connect ( )
+	 users_value = connection . execute ( "" select * from query_users "" ) . fetchall ( )
+	 connection . close ( )
+	 return users_value"
+Generate origin code: Use the python expression to set up SQL ( query all the information in the $queue_table$ table based on $insertion_time$ ) . Returns all the data of the query executed with $conn$.,"from sqlalchemy . sql import select
+def get_from_insertion ( conn , queue_table , insertion_time ) :
+	 s = select ( queue_table ) . where ( queue_table . c . insertion_time == insertion_time )
+	 return conn . execute ( s ) . fetchall ( )"
+"Generate origin code: Use the with statement to connect the database according to $engine$. Execute SQL ( query the drinker column in the Transactions table according to $transactionID$ ) , get all the query results, convert each item of the query result to dict, store it as list, and return.","def query_page ( engine , transactionID ) :
+	 with engine . connect ( ) as con :
+	 	 rs = con . execute ( "" select drinker from Transactions where transactionID = : transactionID "" , { "" transactionID "" : transactionID } ) . fetchall ( )
+	 	 results = [ dict ( row ) for row in rs ]
+	 	 return results"
+"Generate origin code: Execute SQL through $conn$ ( query all columns in secrets table based on $id$ ) and get all data. Use for loop iterate the query results, convert the 0th element of each item in the query results to a string and store it in list. Return all the query results.","def test ( conn , id ) :
+	 results = conn . execute ( "" select * from secrets where id = : id "" , { "" id "" : id } ) . fetchall ( )
+	 secret_list = [ ]
+	 for row in results :
+	 	 secret_list . append ( str ( row [ 0 ] ) )
+	 return results"
+"Generate origin code: Execute SQL with $conn$ ( query the isbn and author columns in the books table according to $title$ ) and return the rendered ""error.html"" page if the rowcount field of the execution result is 0. Get all the results of the execution statement and return the rendered ""results.html"" page, where the parameter books is the obtained data.","from flask import render_template
+def search ( conn , title ) :
+	 rows = conn . execute ( "" select isbn, author from books where title = : title "" , { "" title "" : title } )
+	 if rows . rowcount == 0 :
+	 	 return render_template ( "" error.html "" )
+	 books = rows . fetchall ( )
+	 return render_template ( "" results.html "" , books = books )"
+"Generate origin code: Connect the database with $engine$ and set the SQL statement: Query all columns in the tablename table based on $value$. Try to execute the SQL statement, get all the data, and convert each item of the query result into dict and store it into list. If an Exception occurs, use raise to throw an exception based on the error message. Finally, close the database connection and release the resources consumed by the connection. Return the list content.","def select_value ( engine , value ) :
+	 connection = engine . connect ( )
+	 sql = "" select * from tablename where value = : value "" 
+	 try :
+	 	 result = connection . execute ( sql , { "" value "" : value } ) . fetchall ( )
+	 	 rows = [ dict ( row ) for row in result ]
+	 except Exception as error :
+	 	 raise error
+	 finally :
+	 	 connection . close ( )
+	 	 engine . dispose ( )
+	 return rows"
+Generate origin code: Use $conn$ to execute SQL ( query the number of all columns in the collisions table ) and get all the query results. Use for loop to convert each query result into a string and connect it with 'join'. Return the obtained concatenate string.,"def viewdb ( conn ) :
+	 rows = conn . execute ( "" select count(*) from collisions "" ) . fetchall ( )
+	 return "" "" . join ( str ( row ) for row in rows )"
+Generate origin code: Execute the SQL statement ( query all columns in the stock where id is $id$ ) using $conn$ and get all the data. Use the for loop to print the 0th element of each item in the query result.,"def select_stock ( conn , id ) :
+	 sql = "" select * from stock where id = : id "" 
+	 results = conn . execute ( sql , { "" id "" : id } ) . fetchall ( )
+	 for x in results :
+	 	 print ( x [ 0 ] )
+	 return results"
+"Generate origin code: Get information through search_string in request. If the data is obtained, use $conn$ to execute SQL: To get all the title data in the books_table based on $author$. Print the query results and return.","from flask import request
+def search ( conn , author ) :
+	 search_string = request . form . get ( "" search_string "" )
+	 if search_string :
+	 	 books = conn . execute ( "" select title from books_table where author = : author "" , { "" author "" : author } ) . fetchall ( )
+	 	 print ( books )
+	 	 return books"
+"Generate origin code: Set the SQL to query all user_id in $ic_user_session$ where session_hash is $session_hash$ ) , execute the SQL with $conn$ and return the acquired data.","def query_page ( conn , session_hash ) :
+	 s = "" select user_id from ic_user_session where session_hash= "" + session_hash
+	 res = conn . execute ( s ) . fetchall ( )
+	 return res"
+"Generate origin code: Use the $conn$ connection to execute SQL ( query all columns in the pay_newitem table through $barcode$ ) and get all the data, use """" to connect the query results and return.","def message_processor ( conn , barcode ) :
+	 result = conn . execute ( "" select * from pay_newitem where barcode = : barcode "" , { "" barcode "" : barcode } ) . fetchall ( )
+	 return "" "" . join ( result )"
+"Generate origin code: If the request method of quest is POST, use $conn$ to execute SQL ( query all columns in the register_users table when id equals $newID$ ) and get all the data, return to the rendered ""register.html"" page, and pass the query result to the users parameter. Otherwise, return the rendered ""register.html"".","from flask import request , render_template
+def register ( conn , newID ) :
+	 if request . method == "" POST "" :
+	 	 user = conn . execute ( "" select * from register_users where id = : id "" , { "" id "" : newID } ) . fetchall ( )
+	 	 return render_template ( "" register.html "" , users = user )
+	 return render_template ( "" register.html "" )"
+"Generate origin code: Use the with statement to connect to the database with where engine is $engine$. Execute the SQL statement ( query for all the columns in the Drinkers where name is $name$ and city is $city$ ) to get all the data, convert each query result item to dict, store it as a list, and return.","def get_drinkers ( engine , name , city ) :
+	 with engine . connect ( ) as conn :
+	 	 Drink_data = conn . execute ( "" select * from Drinkers where name = : name and city = : city "" , { "" name "" : name , "" city "" : city } ) . fetchall ( )
+	 	 return [ dict ( row ) for row in Drink_data ]"
