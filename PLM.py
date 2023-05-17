@@ -12,10 +12,11 @@ from tqdm import tqdm
 from transformers import (RobertaTokenizer,
                           T5Config, T5ForConditionalGeneration, AdamW, get_linear_schedule_with_warmup)
 import logging
-from pylint import epylint as lint
 
+from java_compile import check_java_code
 from model import SyntaxGuideCodeT5Genration
 from datasets import read_examples, convert_examples_to_features
+from python_compile import code_staticAnaylsis
 from utils import get_bleu4_score
 
 logger = logging.getLogger(__name__)
@@ -48,34 +49,20 @@ def build_or_load_gen_model(model_type, model_name_or_path, load_model_path):
         model.load_state_dict(torch.load(load_model_path))
     return config, model, tokenizer
 
-def code_staticAnaylsis(code, id=None):
-    cur_time = str(time.time()).replace(".","")
-    if(id is None):
-        id = random.randint(1, 1000)
-    with open(cur_time+str(id)+".py",'w') as f:
-        f.write("# pylint: disable=E1101\n")
-        f.write(code)
-    (pylint_stdout, pylint_stderr) = lint.py_run(cur_time+str(id)+".py -s yes", return_std=True)
-    os.remove(cur_time+str(id)+".py")
-    pylint_stdout_str = pylint_stdout.read()
-    if "E0" in pylint_stdout_str or "E1" in pylint_stdout_str:
-        return True
-    return False
-
 class PLM_model():
-    def __init__(self, model_type, model_name_or_path, load_model_path, beam_size, max_source_length, max_target_length):
+    def __init__(self, model_type, model_name_or_path, load_model_path, beam_size, max_source_length, max_target_length, lang):
         self.model_type = model_type
         self.config, self.model, self.tokenizer = build_or_load_gen_model(model_type, model_name_or_path,
                                                                           load_model_path)
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         self.model.to(self.device)
         self.beam_size, self.max_source_length, self.max_target_length = beam_size, max_source_length, max_target_length
-
+        self.lang = lang
 
     def train(self, train_filename, train_batch_size, learning_rate, num_train_epochs, early_stop, do_eval, eval_filename, eval_batch_size, output_dir, do_eval_bleu):
         
         train_examples = read_examples(train_filename, 'train')
-        train_features = convert_examples_to_features(train_examples, self.tokenizer, self.max_source_length, 512, stage='train')
+        train_features = convert_examples_to_features(train_examples, self.tokenizer, self.max_source_length, self.max_target_length*2, stage='train')
         
         all_source_ids = torch.tensor([f.source_ids for f in train_features], dtype=torch.long)
         all_source_mask = torch.tensor([f.source_mask for f in train_features], dtype=torch.long)
@@ -297,11 +284,19 @@ class PLM_model():
 
         final_hyp_list = []
         assert len(ref_list) == len(hyp_list)
-        for i in tqdm(range(len(hyp_list))):
-            if code_staticAnaylsis(hyp_list[i], i) == False:
-                final_hyp_list.append(hyp_list[i])
-            else:
-                final_hyp_list.append(self.greedy_search(to_predict[i], hyp_list[i]))
+        if self.lang=='Python':
+            for i in tqdm(range(len(hyp_list))):
+                if code_staticAnaylsis(hyp_list[i]) == True:
+                    final_hyp_list.append(hyp_list[i])
+                else:
+                    final_hyp_list.append(self.sf_beam_search(to_predict[i], hyp_list[i], self.lang))
+        if self.lang=='Java':
+            for i in tqdm(range(len(hyp_list))):
+                if check_java_code(hyp_list[i]) == True:
+                    final_hyp_list.append(hyp_list[i])
+                else:
+                    final_hyp_list.append(self.sf_beam_search(to_predict[i], hyp_list[i], self.lang))
+
         df = pd.DataFrame(ref_list)
         df.to_csv(output_dir+"/gold.csv", index=False, header=None)
         df = pd.DataFrame(final_hyp_list)
@@ -309,6 +304,38 @@ class PLM_model():
         bleu4 = get_bleu4_score(final_hyp_list, ref_list) * 100
         logger.info('test set: bleu = %.2f' % bleu4)
         logger.info("  " + "*" * 20)
+
+    def sf_beam_search(self, to_predict, logit_hyp, lang):
+        flag = False
+        input = self.tokenizer.encode_plus(to_predict, max_length=self.max_source_length,
+                                           padding="max_length",
+                                           return_tensors="pt",
+                                           truncation=True, )
+        input_ids = input["input_ids"].to(self.device)
+        source_mask = input["attention_mask"].to(self.device)
+        ids = self.model.generate(
+                input_ids,
+                attention_mask=source_mask,
+                num_beams=self.beam_size,
+                max_length=self.max_target_length,
+                num_return_sequences=self.beam_size
+            )
+        for i in range(self.beam_size):
+            code = self.tokenizer.decode(ids[i].cpu().numpy(), clean_up_tokenization_spaces=False)
+            code = code.replace('<pad>', '')
+            code = code.replace('<s>', '')
+            code = code.replace('</s>', '')
+            if lang == 'Python':
+                if (flag == False and code_staticAnaylsis(code) == True):
+                    logit_hyp = code
+                    flag = True
+                    break
+            if lang == 'Java':
+                if (flag == False and check_java_code(code) == True):
+                    logit_hyp = code
+                    flag = True
+                    break
+        return logit_hyp
 
     def test(self, batch_size, filename, output_dir):
         logger.info("  " + "***** Testing *****")
@@ -339,7 +366,6 @@ class PLM_model():
             outputs = self.model.generate(input_ids,
                                               attention_mask=source_mask,
                                               num_beams=self.beam_size,
-                                              do_sample=True,
                                               max_length=self.max_target_length)
             all_outputs.extend(outputs.cpu().numpy())
 

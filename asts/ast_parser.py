@@ -1,35 +1,38 @@
+# -*- coding: utf-8 -*-
 
 import tree_sitter
 from tree_sitter import Language, Parser
 import re
 
-import enums
+LANG_JAVA = 'java'
+LANG_PYTHON = 'python'
+LANG_GO = 'go'
+LANG_PHP = 'php'
+LANG_JAVASCRIPT = 'javascript'
+LANG_RUBY = 'ruby'
+LANG_C_SHARP = 'c_sharp'
 
-LANGUAGE = {enums.LANG_GO: Language('D:\论文代码开源\CodeGen_CodeT5_copy\\asts\\build\my-languages.so', 'go'),
-            enums.LANG_JAVASCRIPT: Language('D:\论文代码开源\CodeGen_CodeT5_copy\\asts\\build\my-languages.so', 'javascript'),
-            enums.LANG_PYTHON: Language('D:\论文代码开源\CodeGen_CodeT5_copy\\asts\\build\my-languages.so', 'python'),
-            enums.LANG_JAVA: Language('D:\论文代码开源\CodeGen_CodeT5_copy\\asts\\build\my-languages.so', 'java'),
-            enums.LANG_PHP: Language('D:\论文代码开源\CodeGen_CodeT5_copy\\asts\\build\my-languages.so', 'php'),
-            enums.LANG_RUBY: Language('D:\论文代码开源\CodeGen_CodeT5_copy\\asts\\build\my-languages.so', 'ruby'),
-            enums.LANG_C_SHARP: Language('D:\论文代码开源\CodeGen_CodeT5_copy\\asts\\build\my-languages.so', 'c_sharp')}
+path = 'D:\论文代码开源\CodeGen\evaluate\CodeBLEU\parser\my-languages.so'
 
-# LANGUAGE = {enums.LANG_GO: Language('build/my-languages.so', 'go'),
-#             enums.LANG_JAVASCRIPT: Language('build/my-languages.so', 'javascript'),
-#             enums.LANG_PYTHON: Language('build/my-languages.so', 'python'),
-#             enums.LANG_JAVA: Language('build/my-languages.so', 'java'),
-#             enums.LANG_PHP: Language('build/my-languages.so', 'php'),
-#             enums.LANG_RUBY: Language('build/my-languages.so', 'ruby'),
-#             enums.LANG_C_SHARP: Language('build/my-languages.so', 'c_sharp')}
+LANGUAGE = {
+    # LANG_GO: Language(path, 'go'),
+    #         LANG_JAVASCRIPT: Language(path, 'javascript'),
+            LANG_PYTHON: Language(path, 'python'),
+            LANG_JAVA: Language(path, 'java'),
+            # LANG_PHP: Language(path, 'php'),
+            # LANG_RUBY: Language(path, 'ruby'),
+            # LANG_C_SHARP: Language(path, 'c_sharp')
+    }
 
 parser = Parser()
 
 SOURCE_PREFIX_POSTFIX = {
-    enums.LANG_PHP: ['<?php ', ' ?>'],
-    enums.LANG_JAVA: ['class A{ ', ' }']
+    LANG_PHP: ['<?php ', ' ?>'],
+    LANG_JAVA: ['class A{ ', ' }']
 }
 
 PATTERNS_METHOD_ROOT = {
-    enums.LANG_JAVA: """
+    LANG_JAVA: """
     (program
         (class_declaration
             body: (class_body
@@ -40,13 +43,13 @@ PATTERNS_METHOD_ROOT = {
 }
 
 PATTERNS_METHOD_BODY = {
-    enums.LANG_JAVA: """
+    LANG_JAVA: """
     (method_declaration
         body: (block) @body
     )
     """,
 
-    enums.LANG_JAVASCRIPT: """
+    LANG_JAVASCRIPT: """
     (program
         (function_declaration
             body: (statement_block) @body
@@ -54,7 +57,7 @@ PATTERNS_METHOD_BODY = {
     )
     """,
 
-    enums.LANG_GO: """
+    LANG_GO: """
     (source_file
         [
         (function_declaration
@@ -68,13 +71,13 @@ PATTERNS_METHOD_BODY = {
 }
 
 PATTERNS_METHOD_NAME = {
-    enums.LANG_JAVA: """
+    LANG_JAVA: """
     (method_declaration
         name: (identifier) @method_name
     )
     """,
 
-    enums.LANG_PYTHON: """
+    LANG_PYTHON: """
     (module
         (function_definition
             name: (identifier) @method_name
@@ -82,7 +85,7 @@ PATTERNS_METHOD_NAME = {
     )
     """,
 
-    enums.LANG_GO: """
+    LANG_GO: """
     [
         (source_file
             (method_declaration
@@ -97,7 +100,7 @@ PATTERNS_METHOD_NAME = {
     ]
     """,
 
-    enums.LANG_JAVASCRIPT: """
+    LANG_JAVASCRIPT: """
     (program
         (function_declaration
             name: (identifier) @method_name
@@ -105,7 +108,7 @@ PATTERNS_METHOD_NAME = {
     )
     """,
 
-    enums.LANG_RUBY: """
+    LANG_RUBY: """
     (program
         (method
             name: (identifier) @method_name
@@ -113,7 +116,7 @@ PATTERNS_METHOD_NAME = {
     )
     """,
 
-    enums.LANG_PHP: """
+    LANG_PHP: """
     (program
         (function_definition
             name: (name) @method_name
@@ -123,13 +126,13 @@ PATTERNS_METHOD_NAME = {
 }
 
 PATTERNS_METHOD_INVOCATION = {
-    enums.LANG_JAVA: """
+    LANG_JAVA: """
     (method_invocation
         name: (identifier) @method_invocation
     )
     """,
 
-    enums.LANG_PYTHON: """
+    LANG_PYTHON: """
     [
         (call
             function: (identifier) @method_invocation
@@ -142,7 +145,7 @@ PATTERNS_METHOD_INVOCATION = {
     ]
     """,
 
-    enums.LANG_GO: """
+    LANG_GO: """
     [
         (call_expression
             function: (selector_expression
@@ -155,7 +158,7 @@ PATTERNS_METHOD_INVOCATION = {
     ]
     """,
 
-    enums.LANG_JAVASCRIPT: """
+    LANG_JAVASCRIPT: """
     [
         (call_expression
             function: (member_expression
@@ -168,13 +171,13 @@ PATTERNS_METHOD_INVOCATION = {
     ]
     """,
 
-    enums.LANG_RUBY: """
+    LANG_RUBY: """
     (call
         method: (identifier) @method_invocation
     )
     """,
 
-    enums.LANG_PHP: """
+    LANG_PHP: """
     [
         (scoped_call_expression
             name: (name) @method_invocation
@@ -195,13 +198,13 @@ PATTERNS_METHOD_INVOCATION = {
 }
 
 STATEMENT_ENDING_STRINGS = {
-    enums.LANG_JAVA: ['statement', 'expression', 'declaration'],
-    enums.LANG_PYTHON: ['statement', 'assignment'],
-    enums.LANG_GO: ['statement', 'declaration', 'expression'],
-    enums.LANG_JAVASCRIPT: ['statement', 'expression'],
-    enums.LANG_RUBY: ['call', 'assignment', 'if', 'unless_modifier', 'operator_assignment', 'if_modifier', 'return',
+    LANG_JAVA: ['statement', 'expression', 'declaration'],
+    LANG_PYTHON: ['statement', 'assignment'],
+    LANG_GO: ['statement', 'declaration', 'expression'],
+    LANG_JAVASCRIPT: ['statement', 'expression'],
+    LANG_RUBY: ['call', 'assignment', 'if', 'unless_modifier', 'operator_assignment', 'if_modifier', 'return',
                       'rescue', 'else', 'unless', 'when', 'for', 'while_modifier', 'until'],
-    enums.LANG_PHP: ['statement', 'expression']
+    LANG_PHP: ['statement', 'expression']
 }
 
 
@@ -257,7 +260,10 @@ def parse_ast(source, lang):
     if lang in PATTERNS_METHOD_ROOT:
         query = LANGUAGE[lang].query(PATTERNS_METHOD_ROOT[lang])
         captures = query.captures(root)
-        root = captures[0][0]
+        try:
+            root = captures[0][0]
+        except IndexError:
+            return root
     return root
 
 
@@ -376,7 +382,7 @@ def get_node_type(node, lang):
         str: Type of the node
 
     """
-    return f'{node.type}_statement' if lang == enums.LANG_RUBY else node.type
+    return f'{node.type}_statement' if lang == LANG_RUBY else node.type
 
 
 def __statement_xsbt(node, lang):

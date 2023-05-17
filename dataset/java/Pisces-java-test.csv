@@ -1,0 +1,1766 @@
+﻿id,NL,Code
+13152,"Execute The SQL (get The user column in The books where isbn is $isbn$) with $conn$ and get the first data. If the query result is None, return ""error"":""The book is not in the database"" possessed by json, otherwise return the query result.","public JSONObject bookApi(JdbcTemplate conn, String isbn) {
+    List<Object> res = conn.query(""select user from books where isbn = ?"" ,new Object[]{isbn},
+            new BeanPropertyRowMapper(List.class));
+    JSONObject json = null;
+    if (res == null){
+        json = new JSONObject(new HashMap(){{put(""error"", ""The book is not in the database"");}});
+    }else{
+        json = new JSONObject(new HashMap(){{put(""user"", res.get(0));}});
+    }
+    return json;
+}"
+13102,"Use $postgres$ to get the database engine and execute the SQL (get the date_part in the stock_data) and get all the data, and use the for loop to store the list type with the 'year' for the first element of each item in the query result, finally, return the list content that JSONArray handles.","public Object getYears(DataSource postgres) {
+    JdbcTemplate engine = new JdbcTemplate(postgres);
+    List<Object> data = engine.query(""select date_part from stock_data"",
+            new BeanPropertyRowMapper(List.class));
+    List<Object> newdata = new ArrayList();
+    for (Object x:data) {
+        Map d = new HashMap(){{put(""year"", x.toString());}};
+        newdata.add(d);
+    }
+    JSONArray json = new JSONArray(newdata);
+    return json;
+}"
+11365,Use $conn$ to execute SQL (query all the information in the log table based on $information_schema$) and return all query results.,"public List showTables(JdbcTemplate conn, String information_schema ) {
+    List<Map> query = conn.query(""select * from log where information_schema = ?"" ,new Object[]{information_schema },
+            new BeanPropertyRowMapper(List.class));
+    return query;
+}"
+13091,Use $conn$ to execute SQL (query all columns in the dialog table) and get all the data. Return the query results.,"public List dialogShowdb(JdbcTemplate conn) {
+    List<Map> texts = conn.query(""select * from dialog"",
+            new BeanPropertyRowMapper(List.class));
+    return texts;
+}"
+11633,"Use $engine$ to connect to the database, execute SQL (get the accident_name column in the accident_table whose accident_id is $id$ and accident_date is $date$) and get all the data. Use for loop to convert each item of the query result to a mapionary type and return it through the JSONArray method.","public JSONArray example(DataSource engine, Integer id, Date date) {
+    JdbcTemplate connection = new JdbcTemplate(engine);
+    String sql = ""select accident_name from accident_table where accident_id = ? and accident_date = ?"";
+    List<Object> res = connection.query(sql, new Object[]{id, date},
+            new BeanPropertyRowMapper(List.class));
+    List<Object> result = new ArrayList<>();
+    for(Object r:res){
+        result.add(new HashMap(){{put(""date"", r);}});
+    }
+    return new JSONArray(result);
+}"
+11149,"Try to use all the columns in the $conn$ ratings where the score is $score$, get all the data, and use a for loop to traverse the query results and print them. If an Exception occurs, return False.","public Boolean mysqlTrace(JdbcTemplate conn, String score) {
+    try {
+        List<Object> kong = conn.query(""select * from ratings where score = ?"", new Object[]{score},
+                new BeanPropertyRowMapper(List.class));
+        for(Object r:kong){
+            System.out.println(r.toString());
+        }
+        return Boolean.TRUE;
+    } catch (Exception e){
+        return Boolean.FALSE;
+    }
+}"
+11231,"Use the JdbcTemplate to get the connection via $db$, execute the SQL (get the Creator_Email in event_details based on $Ref_Code$), get all the data, and finally return the obtained result.","public List cancel(DataSource db, String Ref_Code){
+    JdbcTemplate connection = new JdbcTemplate(db);
+    String sql_query = ""select Creator_Email from event_details where Ref_Code = ?"";
+    List<Object> creator_email = connection.query(sql_query, new Object[]{Ref_Code},
+            new BeanPropertyRowMapper(List.class));
+    return creator_email;
+}"
+13810,Use ORM method to query the first piece of data in the $User$ table with name as $name$ through $db$. Set the assertion to determine the length of the returned results is greater than 0 and return the query results.,"public List<Object> getValue(EntityManager db, Root<Object> user, String name){
+    CriteriaBuilder cb=db.getCriteriaBuilder();
+    CriteriaQuery<Object> cq=cb.createQuery(Object.class);
+    cq.select(user).where(cb.equal(user.get(""name""),name));
+    List<Object> rs = db.createQuery(cq).getResultList();
+    assert rs.size()>0;
+    return rs;
+}"
+13271,"Execute SQL (get all columns in users where the name of user $username$) with $conn$ and get all the data. Then return rendered 'register.html', where the users parameter is the result of the query executing the SQL statement.","public String selectRegister(Model model, JdbcTemplate conn, String username) {
+    String register_sql = ""select * from users where username = ?"";
+    List<Object> users = conn.query(register_sql, new Object[]{username},
+            new BeanPropertyRowMapper(List.class));
+    model.addAttribute(""users"", users);
+    return ""register.html"";
+}"
+11389,"Use $conn$ to execute SQL (query all columns in the sightings table based on $lat$ and $lon$) and get all the query results. Use for loop to convert each of the query results into map, and store them in list, and return this list.","public List getPokemonSpawnedAt(JdbcTemplate conn, String lat, String lon) {
+    List<Object> query = conn.query(""select * from sightings where lat = ? and lon = ?"", new Object[]{lat, lon},
+            new BeanPropertyRowMapper(List.class));
+    List<Object> pokemons = new ArrayList<>();
+    for(Object r:query){
+        pokemons.add(new HashMap(){{put(""pokemon"", r);}});
+    }
+    return pokemons;
+}"
+13798,"If the request method is ""POST"", use $connection$ to execute sql (query the id column in the articles table based on $title$ and $body$), get all the query results, and return the query results. Else return the null.","public List editArticle(HttpRequest request, JdbcTemplate connection, String title, String body){
+    if(request.getMethod().equals(""POST"")){
+        String sql = ""select id from articles where title = ? and body = ?"";
+        List<Object> render = connection.query(sql, new Object[]{title, body},
+                new BeanPropertyRowMapper(List.class));
+        return render;
+    } else {
+        return new ArrayList();
+    }
+}"
+13916,"Try to connect the database with $db_connect$, execute the SQL statement: Query all the columns in the ticket table where tn is $user_tn$, convert each item of the query result to map, store it as list, and use jsonify to return the query result. If an exception occurs, use jsonify to return 'error' (where the 'error' content is 'fail').","public JSONArray getUserTn(DataSource db_connect, String user_tn){
+    List<Object> result = new ArrayList();
+    try{
+        JdbcTemplate connection = new JdbcTemplate(db_connect);
+        List<Object> query = connection.query(""select * from ticket where tn = ?"", new Object[]{user_tn},
+                new BeanPropertyRowMapper(List.class));
+        for(Object r:query){
+            result.add(new HashMap(){{put(""user_tn"", r);}});
+        }
+    } catch (Exception e){
+        result.add(new HashMap(){{put(""error"", ""fail"");}});
+    }
+    return new JSONArray(result);
+}"
+13329,"Use $db$ to connect the database, execute SQL (query the number of all columns in the query_users table based on $user_id$), set the assertion to determine whether the length of all the data obtained is 0, and return the result.","public Integer queryPage(DataSource db_connect, Integer user_id) {
+    JdbcTemplate connection = new JdbcTemplate(db_connect);
+    int result = connection.queryForObject(""select count(*) from query_users where user_id = ?"", new Object[]{user_id}, Integer.class);
+    assert result != 0;
+    return result;
+}"
+14095,"Connect to the database according to $engine$. Set the SQL statement and the content is as follows: Query all columns in the movies_mean_count table whose rating_count is greater than $rating$, and execute SQL to get all the data and return the list content.","public List getMostRatedMovies(DataSource engine, Integer rating){
+    JdbcTemplate conn = new JdbcTemplate(engine);
+    String query = ""select * from movies_mean_count where rating_count > ?"";
+    List<Object> results = conn.query(query, new Object[]{rating},
+            new BeanPropertyRowMapper(List.class));
+    return results;
+}"
+13740,"Use $conn$ to execute SQL (query all columns in the pooling table based on $client$), get and return all the query results, and set assertions to determine whether the length of the query results is greater than 0.","public List testMainPooling(JdbcTemplate conn, String client){
+    List<Object> v = conn.query(""select * from pooling where client = ?"", new Object[]{client},
+            new BeanPropertyRowMapper(List.class));
+    assert v.size() > 0;
+    return v;
+}"
+11044,"Set SQL with the java expression (query all the information in the $users$ table based on $username$). Use $conn$ to execute SQL and get all query results. If all the results of the query are None, a $UnauthorizedError$ exception is formed. Otherwise, return the query result.","public List<Object> login(EntityManager db, Root<Object> users, String username) throws Exception {
+    CriteriaBuilder cb=db.getCriteriaBuilder();
+    CriteriaQuery<Object> cq=cb.createQuery(Object.class);
+    cq.select(users).where(cb.equal(users.get(""username""),username));
+    List<Object> recs_data = db.createQuery(cq).getResultList();
+    if (recs_data == null){
+        throw new Exception();
+    }
+    else {
+        return recs_data;
+    }
+}"
+13711,"Use $eng$ to get the connection, and use the java expression to set up SQL: Query all the information in the $tab$ table based on $code_no$. Use the database connection to execute the SQL, get all the data, and finally return the query results.","public List<Object> modify(EntityManager eng, Root<Object> tab, String code_no){
+    CriteriaBuilder cb=eng.getCriteriaBuilder();
+    CriteriaQuery<Object> cq=cb.createQuery(Object.class);
+    cq.select(tab).where(cb.equal(tab.get(""code_no""),code_no));
+    List<Object> r = eng.createQuery(cq).getResultList();
+    return r;
+}"
+13795,"Set SQL (query the rating column in the review table based on $average_score$ and $review_count$), execute SQL based on $conn$ and get all the query results. If no results is queried, return the mapionary converted to json format, where the value of the ""Error"" key is set to ""No book""; otherwise, return the mapionary converted to json format, where the value of the ""title"" key is set to the title field of the query result, the value of the ""author"" key is set to the author field of the query result, and the value of the ""year"" key is set to the pub_year field of the query result.","public JSONObject api(JdbcTemplate conn, Float average_score, Integer review_count){
+    String sql = ""select * from review where average_score = ? and review_count = ?"";
+    List<Map> api_book = conn.query(sql, new Object[]{average_score, review_count},
+            new BeanPropertyRowMapper(List.class));
+    if (api_book.isEmpty()){
+        return new JSONObject(new HashMap(){{put(""Error"", ""No book"");}});
+    } else {
+        return new JSONObject(new HashMap(){{
+            put(""title"", api_book.get(0).get(""title""));
+            put(""author"", api_book.get(0).get(""author""));
+            put(""year"", api_book.get(0).get(""year""));
+            }
+        });
+    }
+}"
+13050,Use $conn$ to execute SQL (query all columns in the class_schedule table) and get all the data. Return the rendered 'create.html' and pass the query results to the data parameter.,"public String create(JdbcTemplate conn, Model model){
+    List<Object> data = conn.query(""select * from class_schedule"", 
+            new BeanPropertyRowMapper(List.class));
+    model.addAttribute(""data"", data);
+    return ""create.html"";
+}"
+14028,"Through the $conn$ to connect, and use ORM to execute the SQL statement: Query the first piece of data in the $Event$ table where end_date is greater than $time_now$, and return the query results that converted to map.","public JSONObject index(EntityManager conn, Root<Object> Event, Integer time_now){
+    CriteriaBuilder cb=conn.getCriteriaBuilder();
+    CriteriaQuery<Object> cq=cb.createQuery(Object.class);
+    cq.select(Event).where(cb.gt(Event.get(""end_date""),time_now));
+    List<Object> matching_events = conn.createQuery(cq).getResultList();
+    return new JSONObject(new HashMap(){{put(""Event"", matching_events.get(0));}});
+}"
+13241,"Connect to the database engine using $e$, and execute SQL (query all date columns in the RInd) using $conn$. Finally, the keys of the result are executed as the key in the mapionary, and the cursors of each item in the result are executed as the corresponding values. Put each item in the mapionary into a list and return it.","public List search(DataSource e){
+    JdbcTemplate conn = new JdbcTemplate(e);
+    List<Map> query = conn.query(""select date from RInd"", new BeanPropertyRowMapper(List.class));
+    List rs = new ArrayList();
+    for ( Map record: query) {
+        for (Object key:record.keySet()){
+            rs.add(new HashMap(){{put(key, record.get(key));}});
+        }
+    }
+    return rs;
+}"
+13420,Use $conn$ to execute the SQL (get the name column in the Consumables table based on $id$) and get all the data. Then use for loop to convert each item of the query result into mapionary type and return the contents of mapionary.,"public List getConsumables(JdbcTemplate conn, Integer id){
+    String sql = ""select name from Consumables where id = ?"";
+    List<Object> rs = conn.query(sql, new Object[]{id},
+            new BeanPropertyRowMapper(List.class));
+    List result = new ArrayList();
+    for(Object row:rs){
+        result.add(new HashMap(){{put(""name"", row);}});
+    }
+    return result;
+}"
+13064,Use $engine$ to get the database connection. Use the connection to execute SQL (query all columns in audio_features when youtube_id is $yt_id$) and get the first piece of data. Return the query results.,"public Object selectCluster(DataSource engine, Integer yt_id){
+    JdbcTemplate con = new JdbcTemplate(engine);
+    Object audio_id = con.query(""select * from audio_features where youtube_id = ?"", new Object[]{yt_id},
+            new BeanPropertyRowMapper(List.class)).get(0);
+    return audio_id;
+}"
+11287,"Set SQL (get all the columns in the 'table' table based on $filter$), connect to the database using $engine$, execute the SQL statement to get all the data, and finally return the query result.","public List select(JdbcTemplate engine, String filter){
+    String query=""select * from table where filter = ?"";
+    List result = engine.query(query, new Object[]{filter}, new BeanPropertyRowMapper(List.class));
+    return result;
+}"
+13385,"Use $conn$ to execute SQL (query all columns in the flights table based on $fli_id$), get all the query results, return the rendered ""flights.html"" page, and set the flights parameter to the query result.","public String flights(JdbcTemplate conn, Integer fli_id, Model model){
+    List<Object> flights = conn.query(""select * from flights where fli_id = ?"", new Object[]{fli_id},
+            new BeanPropertyRowMapper(List.class));
+    model.addAttribute(""flights"", flights);
+    return ""flights.html"";
+}"
+13816,Query the first piece of clock with id as $id$ in the horse table through $session$. Return the query results.,"public Object queryData(JdbcTemplate session, Integer id){
+    Object res = session.query(""select * from horse where id = ?"", new Object[]{id},
+            new BeanPropertyRowMapper(List.class)).get(0);
+    return res;
+}"
+11550,"Trough $conn$ to connect, use the java expression to set the SQL statement to get all the name in $targets$ based on $id$ , execute the SQL and return the fetched data.","public List<Object> getTargetByid(EntityManager conn, Root<Object> targets, Integer id){
+    CriteriaBuilder cb=conn.getCriteriaBuilder();
+    CriteriaQuery<Object> cq=cb.createQuery(Object.class);
+    cq.select(targets).where(cb.equal(targets.get(""id""),id));
+    return conn.createQuery(cq).getResultList();
+}"
+13406,"Use $conn$ to execute the SQL (get the synopsis column in the books table based on $id$), then convert the 0th element of the 0th item of the query result into list, and finally return the list contents","public List application(JdbcTemplate conn, Integer id){
+    String query = ""select synopsis from books where id =?"";
+    List<List> output = conn.query(query, new Object[]{id},
+            new BeanPropertyRowMapper(List.class));
+    return new ArrayList(){{add(output.get(0).get(0));}};
+}"
+13437,"Try to use $MYSQL_DB_URL$ to get the database engine and connect to the database, then execute the SQL based on the java expression (get all columns in the $table$ table with the id as $uid$) and get all the data. Then close the connection and return the query results. If exception occurs during execution, print the exception.","public List<Object> getSource(EntityManager MYSQL_DB_URL, Root<Object> table, UUID uid){
+    try {
+        CriteriaBuilder cb=MYSQL_DB_URL.getCriteriaBuilder();
+        CriteriaQuery<Object> cq=cb.createQuery(Object.class);
+        cq.select(table).where(cb.equal(table.get(""uid""),uid));
+        List<Object> res = MYSQL_DB_URL.createQuery(cq).getResultList();
+        return res;
+    } catch (Exception e){
+        System.out.println(e.getMessage());
+        return null;
+    }
+}"
+11266,"Get database engine by $db_string$, try to execute SQL statement (get all columns in project based on $id_fornecedor$) and get all the data. The result will be given true, otherwise print ""Problem occur!"" and the result will be given false. Finally return the result true or false.","public Boolean querySale(DataSource db_string, Integer id_fornecedor){
+    JdbcTemplate db = new JdbcTemplate(db_string);
+    Boolean res = Boolean.TRUE;
+    try {
+        db.query(""select * from project where id_fornecedor = ?"", new Object[id_fornecedor], new BeanPropertyRowMapper(List.class));
+        res = Boolean.TRUE;
+    } catch (Exception e){
+        System.out.println(""Problem occur!"");
+        res = Boolean.FALSE;
+    }
+    return res;
+}"
+11699,"If the request method is 'POST', use $db$ to execute SQL according to the java expression (get the username column in the $users$ table whose first_name is $fname$ and password is $pwd$), get the first piece of data, and then return the query result.","public List checkLogin(HttpRequest request, EntityManager db, Root<Object> users, String fname, String pwd){
+    if (request.getMethod().equals(""POST"")){
+        CriteriaBuilder cb=db.getCriteriaBuilder();
+        CriteriaQuery<Object> cq=cb.createQuery(Object.class);
+        cq.select(users).where(cb.equal(users.get(""fname""),fname), cb.equal(users.get(""pwd""),pwd));
+        List<Object> res = db.createQuery(cq).getResultList();
+        return res;
+    } else {
+        return null;
+    }
+}"
+11589,"Try to use $conn$ to query all the columns in the manager table where orderid is $orderid$, get all the data, use for loop to store the 0th element of each item in the query result into list and return the list content. Print 'query fail' if there is an exception.","public List getHallNameFromManagerId(JdbcTemplate conn, String orderid){
+    List k = new ArrayList();
+    try {
+        List<List> row = conn.query(""select * from manager where orderid = ?"", new Object[]{orderid},
+                new BeanPropertyRowMapper(List.class));
+        for(List r:row){
+            k.add(r.get(0));
+        }
+    } catch (Exception e){
+        System.out.println(""query fail"");
+    }
+    return k;
+}"
+11472,"Set up SQL (query the trained_model column in the models table based on $accuracy_score$). Use $dbconn$ to execute the SQL, get the first piece of data, and return the 0th element of the query result.","public Object getBestModel(JdbcTemplate dbconn, Float accuracy_score){
+    String query_sql = ""select trained_model from models where accuracy_score = ?"";
+    List<List> results = dbconn.query(query_sql, new Object[]{accuracy_score},
+            new BeanPropertyRowMapper(List.class));
+    return results.get(0);
+}"
+13672,"Try using $db$ to execute the SQL (query the title information in the books table where isbn is $isbn$) and get the first data, return the rendered ""book.html"" and pass the query result to the book parameter. Redirect and url_for redirect to 'error' if an exception occurs.","public String getBook(JdbcTemplate db, String isbn, Model model) {
+    try {
+        List results = db.query(""select title from books where isbn = ?"", new Object[]{isbn},
+                new BeanPropertyRowMapper(List.class));
+        model.addAttribute(""title"", results.get(0));
+        return ""book.html"";
+    } catch (Exception e){
+        return ""error"";
+    }
+}"
+13005,Use $conn$ to execute SQL (query the id in the current_user table based on $created_at$) and get the first piece of data. Set the assertion to determine that the query result is not empty list. Return the query results.,"public List currentSession(JdbcTemplate conn, Date created_at){
+    List count = conn.queryForObject(""select id from current_user where created_at = ?"", new Object[]{created_at},
+            List.class);
+    assert count.size() > 0;
+    return count;
+}"
+11643,"Use $db_uri$ to get the database engine and execute SQL (get the data column in the example table according to $id$), get all the data, and finally return the query result.","public List searchDatas(DataSource db_uri, Integer id){
+    JdbcTemplate engine = new JdbcTemplate(db_uri);
+    List<Object> datas = engine.query(""select data from example where id = ?"", new Object[]{id},
+            new BeanPropertyRowMapper(List.class));
+    return datas;
+}"
+13107,"Try to use $engine$ to execute the SQL (get all the information in db_satz where uid is $uid$ and pro is $pro$) and get all the data, return the query result, otherwise return None.","public List satzPositivBewerten(JdbcTemplate engine, UUID uid, String pro){
+    try {
+        List rs = engine.query(""select * from db_satz where uid = ? and pro = ?"", new Object[]{uid, pro},
+                new BeanPropertyRowMapper(List.class));
+        return rs;
+    } catch (Exception e){
+        return null;
+    }
+}"
+13754,"Connect the database through $engine$ and set the SQL based on the java expression (query all the columns in the $test_users$ table based on $lastname$). Execute SQL, get all the data and return the query results.","public List testBulkUpdate(EntityManager engine, Root<Object> test_users, String lastname){
+    CriteriaBuilder cb=engine.getCriteriaBuilder();
+    CriteriaQuery<Object> cq=cb.createQuery(Object.class);
+    cq.select(test_users).where(cb.equal(test_users.get(""lastname""),lastname));
+    List<Object> results = engine.createQuery(cq).getResultList();
+    return results;
+}"
+13702,"Create a database engine based on $morphweb_db$ and execute SQL (query the ip in the usertable based on $email$), get the first piece of data, and print the 0th element of each item of the query result.","public String userIp(DataSource morphweb_db, String email){
+    JdbcTemplate session = new JdbcTemplate(morphweb_db);
+    List<List> ret = session.query(""select ip from usertable where email = ?"", new Object[]{email},
+            new BeanPropertyRowMapper(List.class));
+    for(List t:ret){
+        return t.get(0).toString();
+    }
+    return null;
+}"
+13021,"Use $conn$ to execute SQL (query all columns in the users table when username equals $name$) and get all the data. If the query result is not empty list, return the rendered 'error.html'. Otherwise, return the rendered ""success.html"" and pass the query result to the unique parameter.","public String queryUser(JdbcTemplate conn, String name, Model model){
+    List<Object> unique = conn.query(""select * from users where username = ?"", new Object[]{name},
+            new BeanPropertyRowMapper(List.class));
+    if(!unique.isEmpty()){
+        return ""error.html"";
+    } else {
+        model.addAttribute(""unique"", unique);
+        return ""success.html"";
+    }
+}"
+13786,"Try to use $connection$ to execute SQL (query all the information in the query_users table based on $user_id$ and $user_name$), and print the Exception if it is caught. Set the assertion to determine whether the length of all the obtained data is 0.","public void testRaise(JdbcTemplate connection, UUID user_id, String user_name){
+    List result = new ArrayList<>();
+    try{
+        result = connection.query(""select * from query_users where user_id = ? and user_name = ?"",
+                new Object[]{user_id, user_name}, new BeanPropertyRowMapper(List.class));
+    } catch (Exception e) {
+        System.out.println(e.getMessage());
+    }
+    assert result.size() == 0;
+}"
+11145,Set up the SQL using a java expression (query the data column in $z_test$ where id is $id$) and execute the SQL using $conn$ to get the first query result and return it.,"public List queryOldRecs(EntityManager engine, Root<Object> z_test, UUID id){
+    CriteriaBuilder cb=engine.getCriteriaBuilder();
+    CriteriaQuery<Object> cq=cb.createQuery(Object.class);
+    cq.select(z_test).where(cb.equal(z_test.get(""id""),id));
+    List<Object> recs = engine.createQuery(cq).getResultList();
+    return recs;
+}"
+14203,Execute the SQL statement via $conn$: Query all the id data in the books table based on $user_id$ and $book_id$ and return the query results.,"public List checkUserBookAuthorized(JdbcTemplate conn, UUID user_id, String book_id){
+    List<Object> result = conn.query(""select id from books where user_id = ? and book_id = ?"", new Object[]{user_id, book_id},
+            new BeanPropertyRowMapper(List.class));
+    return result;
+}"
+13426,Execute the SQL based on $conn$ (get the name column in the user table based on $group_id$) and get all the data. Use for loop to print each item of the query results.,"public void sqlStm(JdbcTemplate conn, String group_id){
+    String stm = ""select name from user where group_id = ?"";
+    List<Object> rows = conn.query(stm, new Object[]{group_id},
+            new BeanPropertyRowMapper(List.class));
+    for (Object row:rows){
+        System.out.println(row.toString());
+    }
+}"
+11529,"Connect to the database through $testing$. Set up the SQL statement using the java expression (get all id in $users$ table based on $name$), execute the SQL statement. Convert each item of the query result into map and store it as list and return it.","public List getInfo(EntityManager testing, Root<Object> users, String name){
+    CriteriaBuilder cb=testing.getCriteriaBuilder();
+    CriteriaQuery<Object> cq=cb.createQuery(Object.class);
+    cq.select(users).where(cb.equal(users.get(""name""),name));
+    List<Object> information = testing.createQuery(cq).getResultList();
+    List result = new ArrayList();
+    for(Object row:information){
+        result.add(new HashMap(){{put(""name"", row);}});
+    }
+    return result;
+}"
+13126,"Execute the SQL (get all the columns in the report where portfolio is $portfolio$ and date is $date$) with $conn$, get all the data, and return the results of the query.","public List getPortfolio(JdbcTemplate conn, String portfolio, Date date){
+    String qry = ""select * from report where portfolio = ? and date = ?"";
+    List<Object> df = conn.query(qry, new Object[]{portfolio, date},
+            new BeanPropertyRowMapper(List.class));
+    return df;
+}"
+13890,"Use the $conn$ connection to execute the SQL statement: Get all the columns in the flights table based on $id$ and get all the data. If the query result exists, render and return ""indexair.html"", where the flights parameter is the query result.","public String index(JdbcTemplate conn, String id, Model model){
+    List res = conn.query(""select * from flights where id = ?"", new Object[]{id},
+            new BeanPropertyRowMapper(List.class));
+    if (!res.isEmpty()){
+        model.addAttribute(""flights"", res);
+        return ""indexair.html"";
+    } else {
+        return """";
+    }
+}"
+13376,Set SQL based on the java expression (query the stringify column in the $table$ table based on $name$). Return all the data obtained by executing SQL through $conn$.,"public List query(EntityManager conn, Root<Object> table, String name){
+    CriteriaBuilder cb=conn.getCriteriaBuilder();
+    CriteriaQuery<Object> cq=cb.createQuery(Object.class);
+    cq.select(table).where(cb.equal(table.get(""name""),name));
+    return conn.createQuery(cq).getResultList();
+} "
+13737,"Use the ORM method and $conn$ to execute SQL (query all the information in the $leases$ table according to $mac$), get all the queried data, use for loop to traverse all the query results, insert the 0th element of each piece of data into a list, and use for loop to print the list.","public void main(EntityManager conn, Root<Object> leases, String mac){
+    CriteriaBuilder cb=conn.getCriteriaBuilder();
+    CriteriaQuery<Object> cq=cb.createQuery(Object.class);
+    cq.select(leases).where(cb.equal(leases.get(""mac""),mac));
+    List<Object> results =  conn.createQuery(cq).getResultList();
+    for(Object ip:results){
+        System.out.println(ip.toString());
+    }
+}"
+14136,"Get the database engine by $url$. Try to set the SQL: Query the task_id data with task_enumber of $enumber$ in the finishedtask table. Execute SQL to get all data and return. If there is an Exception, return the exception information by logging.error() method.","public List myQuery(DataSource url, String enumber, Logger logger){
+    JdbcTemplate engine = new JdbcTemplate(url);
+    try {
+        String stm = ""select task_id from finishedtask where task_enumber = ?"";
+        List<Object> res = engine.query(stm, new Object[]{enumber}, new BeanPropertyRowMapper(List.class));
+        return res;
+    } catch (Exception e){
+        logger.info(e.getMessage());
+        return null;
+    }
+}"
+11440,"Open and read the file ""books.csv"", loop 'author' in the file, set the SQL (query the isbn column in the books table based on each author), use $conn$ to execute to get all the query results and print.","public void selectIsbn(JdbcTemplate conn) throws Exception {
+    File file = new File(""books.csv"");
+    InputStreamReader reader = new InputStreamReader(new FileInputStream(file));
+    BufferedReader bufferedReader = new BufferedReader(reader);
+    while (bufferedReader.readLine() != null) {
+        String sql = ""select isbn from books where author = ?"";
+        List isbns = conn.query(sql, new Object[]{bufferedReader.readLine()}, new BeanPropertyRowMapper(List.class));
+        System.out.println(isbns.toString());
+    }
+}"
+11310,"Set SQL according to the java expression: (query all the results of all columns in the $user$ table based on $userID$). Get the database engine through $URI$ to execute SQL, use for loop to traverse each query result, and finally print each result.","public void getEntryFromUserTable(EntityManager URI, Root<Object> user, String userID) {
+    CriteriaBuilder cb = URI.getCriteriaBuilder();
+    CriteriaQuery<Object> cq = cb.createQuery(Object.class);
+    cq.select(user).where(cb.equal(user.get(""userID""), userID));
+    List<Object> results = URI.createQuery(cq).getResultList();
+    for (Object row : results) {
+        System.out.println(row.toString());
+    }
+}"
+11463,"Set SQL based on the java expression: (query $table$ table for purchase_type column based on $rec_id$). Execute SQL by $conn$ and get all the data, return True if the length of the query result converted to list is not equal to 0, otherwise return False.","public Boolean isCustomTypes(EntityManager conn, Root<Object> table, String rec_id){
+    CriteriaBuilder cb = conn.getCriteriaBuilder();
+    CriteriaQuery<Object> cq = cb.createQuery(Object.class);
+    cq.select(table).where(cb.equal(table.get(""rec_id""), rec_id));
+    List<Object> types = conn.createQuery(cq).getResultList();
+    if (types.size() != 0){
+        return Boolean.TRUE;
+    } else {
+        return Boolean.FALSE;
+    }
+}"
+11003,Use $conn$ to execute SQL (get all data in db_table based on $db_id$). Return all the query results after executing the statement.,"public List readFromSqlServer(JdbcTemplate conn, String db_id){
+    return conn.query(""select * from db_table where db_id = ?"", new Object[]{db_id}, new BeanPropertyRowMapper(List.class));
+}"
+11563,"Use $conn$ connection to execute SQL statement : Get all columns in books table based on $isbn$ and $title$, and get all data. If the query result is empty, use jsonify to return ""error"" with the content ""Not Found""; otherwise, return the query result.","public JSONObject queryBooks(JdbcTemplate conn, String isbn, String title) {
+    List<Object> row = conn.query(""select * from books where isbn = ? and title = ?"", new Object[]{isbn, title},
+            new BeanPropertyRowMapper(List.class));
+    JSONObject json = null;
+    if (row == null) {
+        json = new JSONObject(new HashMap() {{
+            put(""error"", ""Not Found"");
+        }});
+    } else {
+        json = new JSONObject(new HashMap() {{
+            put(""books"", row);
+        }});
+    }
+    return json;
+}"
+13515,"connect the database according to $engine$. Execute the SQL (according to the itemName column of items in the $manufacturer$ table), get all the query results, convert each item of the query results to map, store them as list, and return.","public List getBeers(DataSource engine, String manufacturer){
+    JdbcTemplate con = new JdbcTemplate(engine);
+    List rs = con.query(""select itemName from items where manufacturer = ?"", new Object[]{manufacturer},
+            new BeanPropertyRowMapper(List.class));
+    List result = new ArrayList();
+    for (Object row : rs) {
+        result.add(new HashMap() {{
+            put(""name"", row);
+        }});
+    }
+    return result;
+}"
+14043,"Set the SQL statement (query all columns in the flow table based on $userid$ and $sessionid$), use e$conn$ to execute SQL to get all the data, use for loop traversal to query the results, and print the userid attribute value of the query results.","public void evaluateUsersWithFewSessions(JdbcTemplate conn, String userid, String sessionid){
+    String query = ""select * from flow where userid = ? and sessionid = ?"";
+    List<Map> resultFlowPerUser = conn.query(query, new Object[]{userid, sessionid}, new BeanPropertyRowMapper(List.class));
+    for(Map userFlow : resultFlowPerUser){
+        System.out.println(userFlow.get(""userid""));
+    }
+}"
+14248,"Use $conn$ to execute the SQL statement (query all the columns in the members table) to get all the data, render and return ""index.html"", where the members parameter is the execution result.","public String index(JdbcTemplate conn, Model model){
+    List members = conn.query(""select * from members"", new BeanPropertyRowMapper(List.class));
+    model.addAttribute(""members"", members);
+    return ""index.html"";
+}"
+11175,"Set up the SQL (query all sequence_name in sequences where schemaval is $schemaval$) , execute the SQL over the $conn$ connection and get the data. Store the 0th element of each item of the query result as a list and return.","public List getSeqListFromDb(JdbcTemplate conn, String schemaval){
+    String sql = ""select sequence_name from sequences where schemaval = ?"";
+    List<List> names = conn.query(sql, new Object[]{schemaval}, new BeanPropertyRowMapper(List.class));
+    List result = new ArrayList();
+    for (List name:names){
+        result.add(name.get(0));
+    }
+    return result;
+}"
+13975,"Set the SQL statement: Query all the columns in the dnsreqs table with $d_id$, use $ses$ to execute SQL to get all the data. For loop iterates through the execution results and print.","public void getDnsHttp(JdbcTemplate ses, String d_id){
+    String sql = ""select * from dnsreqs where d_id = ?"";
+    List results = ses.query(sql, new Object[]{d_id}, new BeanPropertyRowMapper(List.class));
+    for(Object row:results){
+        System.out.println(row.toString());
+    }
+}"
+11206,"Use format method to set the SQL: Query the category_id from the Categories table based on $category$, then use $conn$ to execute and get all the data, and finally return the data.","public List categoryId(JdbcTemplate conn, String category){
+    String sql = ""select category_id from Categories where category = ?"";
+    List result = conn.query(sql, new Object[]{category}, new BeanPropertyRowMapper(List.class));
+    return result;
+}"
+13654," , use $engine$ to get the connection and execute the following code to set the SQL: query the name information in Table D based on $drinkerID$. Execute the SQL using the link and obtain all the data, convert each item in the query result to a map type and return.","public List getFrequents(DataSource engine, String drinkerID){
+    JdbcTemplate con = new JdbcTemplate(engine);
+    String sql = ""select name from D where drinkerID = ?"";
+    List rs = con.query(sql, new Object[]{drinkerID},
+            new BeanPropertyRowMapper(List.class));
+    List result = new ArrayList();
+    for (Object row : rs) {
+        result.add(new HashMap() {{
+            put(""name"", row);
+        }});
+    }
+    return result;
+}"
+13387,"Get the database engine and establish a connection through $DATABASEURI$. Execute the SQL statement (query all the columns in the teams table according to $id$), get all the data, take the query result as the value of the parameter rows, and return the rendered ""listteam.html"" page.","public String listTeam(Model model, DataSource DATABASEURI, Integer id){
+    JdbcTemplate conn = new JdbcTemplate(DATABASEURI);
+    List res = conn.query(""select * from teams where id = ?"", new Object[]{id}, new BeanPropertyRowMapper(List.class));
+    model.addAttribute(""rows"", res);
+    return ""listteam.html"";
+}"
+11572,"Use the $conn$ connection to execute SQL (query the first destination data in the flights table through $fid$). If the query result is empty, print 'Error: no such flight.' and return. Use for loop to traverse the query result and print it.","public void main(JdbcTemplate conn, String fid){
+    List<Object> fout = conn.query(""select destination from flights where fid = ?"", new Object[]{fid},
+            new BeanPropertyRowMapper(List.class));
+    if (fout == null){
+        System.out.println(""Error: no such flight."");
+    } 
+    for (Object f: fout){
+        System.out.println(f.toString());
+    }
+}"
+14194,"Use the java expression to set up the SQL statement: Query the statistics values in the $articles_table$ table based on $month$ and $year$, use $connection$ to execute the SQL to get the first piece of data and return the execution result.","public Object getUndescribedArticleCount(EntityManager connection, Root<Object> articles_table, String month, String year) {
+    CriteriaBuilder cb = connection.getCriteriaBuilder();
+    CriteriaQuery<Object> cq = cb.createQuery(Object.class);
+    cq.select(articles_table).where(cb.equal(articles_table.get(""month""), month), cb.equal(articles_table.get(""year""), year));
+    List<Object> rp = connection.createQuery(cq).getResultList();
+    return rp.get(0);
+}"
+13520,"Use $conn$ to execute SQL (query all columns in the flights table according to $name$), get all the query results, set assertions to determine whether the query result length is not equal to 0, and return to the rendered ""index.html"" page, where the parameter flights is set to the query result.","public String index(JdbcTemplate conn, String name, Model model){
+    List flights = conn.query(""select * from flights where name = ?"", new Object[]{name},
+            new BeanPropertyRowMapper(List.class));
+    assert !flights.isEmpty();
+    model.addAttribute(""flights"", flights);
+    return ""index.html"";
+}"
+11125,"Connect to the database using $conn$, execute SQL statements (query all number data in the availability_data where available_bikes is $available_bikes$) , and use the for loop to traverse the query results and print them.","public void availToDb(JdbcTemplate conn, String available_bikes){
+    List data_points = conn.query(""select number from availability_data where available_bikes = ?"", new Object[]{available_bikes},
+            new BeanPropertyRowMapper(List.class));
+    for (Object data:data_points){
+        System.out.println(data.toString());
+    }
+}"
+11056,"Use the java expression to set SQL (query the id in the $contacts$ table when uuid is $contact_uuid$). Use $conn$ to execute SQL and get the first piece of data. If the data obtained is not None, return the query result. Otherwise, None is returned.","public Object getContact(EntityManager conn, Root<Object> contacts, String contact_uuid) {
+    CriteriaBuilder cb = conn.getCriteriaBuilder();
+    CriteriaQuery<Object> cq = cb.createQuery(Object.class);
+    cq.select(contacts).where(cb.equal(contacts.get(""contact_uuid""), contact_uuid));
+    Object contact = conn.createQuery(cq).getResultList().get(0);
+    if (contact!=null){
+        return contact;
+    } else {
+        return null;
+    }
+}"
+13423,Use $conn$ to execute SQL based on the java expression (get all columns in $SubDomain$ table based on $is_new$) and get all the data. Then use for loop to convert each item of query result into list and finally return the contents of list.,"public List selectMode(EntityManager conn, Root<Object> SubDomain, String is_new){
+    CriteriaBuilder cb = conn.getCriteriaBuilder();
+    CriteriaQuery<Object> cq = cb.createQuery(Object.class);
+    cq.select(SubDomain).where(cb.equal(SubDomain.get(""is_new""), is_new));
+    List results = conn.createQuery(cq).getResultList();
+    List results_list = new ArrayList();
+    for(Object result:results){
+        results_list.add(result);
+    }
+    return results_list;
+}"
+13885,"Use $conn$ to execute SQL statement: Get all columns in table based on $key$, execute SQL and get all the data. Store the 0th element of each item of query results as list and return it.","public List selectKeys(JdbcTemplate conn, String key){
+    List<List> result = conn.query(""select * from table where key = ?"", new Object[]{key},
+            new BeanPropertyRowMapper(List.class));
+    List res = new ArrayList();
+    for (List x:result){
+        res.add(x.get(0));
+    }
+    return res;
+}"
+11449,"Use 'with' statement to connect to database based on $engine$. Set SQL based on the java expression: (query all columns in $eta$ table based on SPRINT_ID: $id$). Execute SQL statement, get all the data, use for loop to convert each query result to dict, store in list and return.","public List getSource(EntityManager engine, Root<Object> eta, String id){
+    CriteriaBuilder cb = engine.getCriteriaBuilder();
+    CriteriaQuery<Object> cq = cb.createQuery(Object.class);
+    cq.select(eta).where(cb.equal(eta.get(""SPRINT_ID""), id));
+    List etas = engine.createQuery(cq).getResultList();
+    List results_list = new ArrayList();
+    for(Object row:etas){
+        results_list.add(new HashMap(){{put(""eta"", row);}});
+    }
+    return results_list;
+}"
+11017,Use $conn$ to execute the SQL (query the table_namet table for old information based on $uc_name$) and get all the data. Use for loop to store the 0th element of each item in the result to list and return.,"public List getUniqueConstraint(JdbcTemplate conn, String uc_name){
+    List<List> ucname = conn.query(""select old from table_namet where name = ?"", new Object[]{uc_name},
+            new BeanPropertyRowMapper(List.class));
+    List namet = new ArrayList();
+    for (List r:ucname){
+        namet.add(r.get(0));
+    }
+    return namet;
+}"
+11030,"Try to execute the following code: Get the connection through $url$ and set the client_encoding parameter to 'utf8'. Execute SQL in ORM (query all columns in the $Story_table$ table based on $author$) and get all the query results. Finally, return the query result. If an exception occurs, print the exception information.","public List initPg(EntityManager url, Root<Object> Story_table, String author){
+    try {
+        CriteriaBuilder cb = url.getCriteriaBuilder();
+        CriteriaQuery<Object> cq = cb.createQuery(Object.class);
+        cq.select(Story_table).where(cb.equal(Story_table.get(""author""), author));
+        List values = url.createQuery(cq).getResultList();
+        return values;
+    } catch (Exception ex){
+        System.out.println(ex.getMessage());
+        return null;
+    }
+}"
+11695,"Use $conn_string$ to get the database engine and execute SQL (get the target column in the targets table based on $url$, $email$ and $id$), get the first piece of data, and finally return the query result.","public Object getTarget(DataSource conn_string, String url, String email, String id){
+    JdbcTemplate engine = new JdbcTemplate(conn_string);
+    String sql = ""select target from targets where url = ? and email = ? and id = ?"";
+    Object target = engine.query(sql, new Object[]{url,email,id}, new BeanPropertyRowMapper(List.class));
+    return target;
+}"
+11488,"Get the database engine via $connection_string$ with the echo parameter being False, and establish a connection. Set up the SQL statement (query all the columns in the saltie table based on $value$), get all the data, close the connection, and return the query results.","public Object selectValue(DataSource conn_string, String value){
+    JdbcTemplate conn = new JdbcTemplate(conn_string);
+    String query_sql = ""select * from saltie where value = ?"";
+    Object results = conn.query(query_sql, new Object[]{value}, new BeanPropertyRowMapper(List.class));
+    return results;
+}"
+14119,"Use the java expression to set the SQL statement as follows: Get the hash information in the $files$ table through $path$, execute SQL to get the first piece of data, make sure that $conn$ is closed. If there is no query result, return False, otherwise return the 0th element of the query results.","public Object get(EntityManager conn, Root<Object> files, String path){
+    CriteriaBuilder cb = conn.getCriteriaBuilder();
+    CriteriaQuery<Object> cq = cb.createQuery(Object.class);
+    cq.select(files).where(cb.equal(files.get(""hash""), path));
+    List r = conn.createQuery(cq).getResultList();
+    if (r.isEmpty()){
+        return Boolean.FALSE;
+    }
+    return r.get(0);
+}"
+11294,"Use $engine$ to connect to the database , execute the SQL (get all columns in drinkers based on $drinkerID$) and get all data. Finally return the query result.","public List generateDrinkerID(DataSource engine, String drinkerID){
+    JdbcTemplate con = new JdbcTemplate(engine);
+    String query = ""select * from drinkers where drinkerID = ?"";
+    List rs = con.query(query, new Object[]{drinkerID}, new BeanPropertyRowMapper(List.class));
+    return rs;
+}"
+13191,"Execute the SQL (get the table_name column in the information_schema where table_schema is $table_schema$) with $conn$ and get all the data, then use the for loop to store the list type for the tenth element of each item in the query result and return.","public List getTableListFromDb(JdbcTemplate conn, String table_schema){
+    String sql=""select table_name from information_schema where table_schema = ?"";
+    List<List> res = conn.query(sql, new Object[]{table_schema}, new BeanPropertyRowMapper(List.class));
+    List results_list = new ArrayList();
+    for(List name:res){
+        results_list.add(name.get(0));
+    }
+    return results_list;
+}"
+14047,"Open the books.csv file and read it, use for loop traversal to iterate over the content, and use $conn$ to execute the SQL statement: Query all the isbn in the books table through 'title' and print the query results.","public void main(JdbcTemplate conn) throws Exception {
+    File file = new File(""books.csv"");
+    InputStreamReader reader = new InputStreamReader(new FileInputStream(file));
+    BufferedReader bufferedReader = new BufferedReader(reader);
+    while (bufferedReader.readLine() != null) {
+        String sql = ""select isbn from books where title = ?"";
+        List res = conn.query(sql, new Object[]{bufferedReader.readLine()}, new BeanPropertyRowMapper(List.class));
+        System.out.println(res.toString());
+    }
+}"
+13484,"If $titulo$ is not None, then execute SQL through $conn$ (get all columns in the peliculas table based on $title$) and get all the data. Then use for loop to store each item of the query results as list and finally return the list.","public List<Object> getPelisByName(JdbcTemplate conn, Object titulo) {
+    if (titulo != null) {
+        String sql = ""select * from peliculas where titulo = ?"";
+        List<Object> results = conn.query(sql,
+                new Object[]{titulo},
+                new BeanPropertyRowMapper(List.class));
+        List<Object> pelicula = new ArrayList<>();
+        for (Object row : results) {
+            pelicula.add(row);
+        }
+        return pelicula;
+    }else{
+    				return Collections.emptyList();
+    }
+}"
+13866,Get the database engine through $sqlite$. Execute the SQL statement (query the first piece of name data in the hello table based on $hid$). Return all the query results.,"public Object createEngine(DataSource sqlite, Integer hid) {
+    JdbcTemplate engine = new JdbcTemplate(sqlite);
+    Object hres = engine.query(""select name from hello where hid = ?"", new Object[]{hid},
+            new BeanPropertyRowMapper(List.class)).get(0);
+    return hres;
+}"
+11348,"Use $conn$ to execute SQL (query all columns in the Substitutes table based on $id_orig$ and $id_sub$), get all the data, and add each item of the query result to the empty list. If the length of list is 0, return None; otherwise, return the query result in list form.","public List<Object> saveProducts(JdbcTemplate conn, Integer id_orig, Integer id_sub) {
+    List<Object> data = conn.query(""select * from Substitutes where id_orig = ? and id_sub = ?"", new Object[]{id_orig, id_sub},
+            new BeanPropertyRowMapper(List.class));
+    List<Object> response = new ArrayList<>();
+    for (Object i : data) {
+        response.add(i);
+    }
+    if (response.size() == 0) {
+        return null;
+    }
+    return response;
+}"
+14227,"Create a cursor object through $conn$, set the SQL statement: Query the id data in the regione table where nome is $nome$, execute the SQL statement to get all the data and return the 0th element of the execution result.","public Object getRegioneIdSql(DataSource conn, String nome){
+    JdbcTemplate c = new JdbcTemplate(conn);
+    String query = ""select id from regione where nome = ?"";
+    List<Object> res = c.query(query, new Object[]{nome},
+            new BeanPropertyRowMapper(List.class));
+    return res.get(0);
+}"
+11094,"Use $conn$ to execute SQL (query the keyfile in the clients table based on $name$ and $system_uuid$) and get all the data. If the query result length is not 0, return the query result.","public List<Object> downloadKey(JdbcTemplate conn, String name, Integer system_uuid) {
+    List<Object> longres = conn.query(""select keyfile from clients where name = ? and system_uuid = ?"", new Object[]{name, system_uuid},
+            new BeanPropertyRowMapper(List.class));
+    if (longres.size() != 0) {
+        return longres;
+    } else {
+        return Collections.emptyList();
+    }
+}"
+11192,"Execute SQL over a $conn$ connection (query all fileval data in the pdf where the name of file is $Filename$). Open fingerprint.csv using binary write mode (wb). The for loop iterates through the query results, and write the query results to a CSV file on a row basis.","public void exportCsv(JdbcTemplate conn, String Filename) {
+    List<Object> res_File = conn.query(""select fileval from pdf where Filename = ?"", new Object[]{Filename},
+            new BeanPropertyRowMapper(List.class));
+    OutputStream f = null;
+    try {
+        f = new FileOutputStream(""fingerprint.csv"", true);
+    } catch (FileNotFoundException e) {
+        e.printStackTrace();
+    }
+    for (Object row : res_File) {
+        try {
+            f.write((byte[]) row);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+}"
+14082,"Use the java expression to set up the SQL statement: Query the id in the $Department$ table through $name$. Execute SQL through $connection$ and get the first piece of data, print the query result and return.","public Object reading(EntityManager db, Root<Object> Department, String name) {
+    CriteriaBuilder cb = db.getCriteriaBuilder();
+    CriteriaQuery<Object> cq = cb.createQuery(Object.class);
+    cq.select(Department.get(""id"")).where(cb.equal(Department.get(""name""), name));
+    List<Object> rs = db.createQuery(cq).getResultList();
+    assert rs.size() > 0;
+    System.out.println(rs.get(0));
+    return rs.get(0);
+}"
+13560,"If $isbn$ is empty, return the rendered ""not_logged_in.html"" page; otherwise, use $conn$ to execute SQL (query the reviewer column in the reviews table according to $isbn$), get all the query results, use for loop traversal to get all the query results, and insert each piece of data into a list. Return the rendered ""write_review.html"" page, where the parameter isbn is $isbn$.","public Object writeReview(JdbcTemplate conn, String isbn, Model model) {
+    if (isbn == null) {
+        return ""not_logged_in.html"";
+    }
+    List<Object> reviewers = conn.query(""select reviewer from reviews where isbn = ?"", new Object[]{isbn},
+            new BeanPropertyRowMapper(List.class));
+    List<Object> u_lis = new ArrayList<Object>();
+    for (Object user : reviewers) {
+        u_lis.add(user);
+    }
+    model.addAttribute(""isbn"", isbn);
+    return ""write_review.html"";
+}"
+13944,"Use the $conn$ connection to execute the SQL statement (query all the columns in the books based on $isbn$) and get the first piece of data. If the execution result exists, use jsonify to return the execution result.","public JSONObject bookApi(JdbcTemplate conn, String isbn) {
+				Object book = conn.query(""select * from books where isbn = ?"", new Object[]{isbn},
+												new BeanPropertyRowMapper(List.class)).get(0);
+				Map<String, Object> res = new HashMap<>();
+				if (book != null) {
+								res.put(""book"", book);
+								return new JSONObject(res);
+				} else {
+								return new JSONObject();
+				}
+}"
+14179,"Execute SQL via $conn$: Get all the job_name in jobzl via $company$, set the assertion to determine that the obtained result is not an empty 'list', print the obtained result and return.","public List<Object> getSelect(JdbcTemplate conn, String company) {
+    List<Object> res = conn.query(""select job_name from jobzl where company = ?"", new Object[]{company},
+            new BeanPropertyRowMapper(List.class));
+    assert res.size() > 0;
+    System.out.println(res);
+    return res;
+}"
+13932,"Set the SQL statement based on $author$, get the year data in the books table, execute the SQL statement with the $conn$ connection, and convert the execution result to list. If the length of the list content is 0, render and return ""failure.html""; otherwise, render and return ""found.html"".","public Object searchResult(JdbcTemplate conn, String author) {
+    String sql = ""select year from books where author = ?"";
+    List<Object> results = conn.query(sql, new Object[]{author},
+            new BeanPropertyRowMapper(List.class));
+    if (results.size() == 0) {
+        return ""failure.html"";
+    }
+    return ""found.html"";
+}"
+11477,"Try to set up SQL (query order_state column in order table based on $ORDER_ID$), execute SQL based on $conn$ and get all the query results. Use for loop to iterate through all the obtained query results, insert each data into a list and return the list. If an exception is caught, print 'fail to get order_state'.","public List<Object> selectState(JdbcTemplate conn, Integer ORDER_ID) {
+    try {
+        String get_state = ""select order_state from order where ORDER_ID = ?"";
+        List<Object> states = conn.query(get_state, new Object[]{ORDER_ID},
+                new BeanPropertyRowMapper(List.class));
+        List<Object> results = new ArrayList<Object>();
+        for (Object row : states) {
+            results.add(row);
+        }
+        return results;
+    } catch (Exception e) {
+        System.out.println(""fail to get order_state"");
+        return Collections.emptyList();
+    }
+}"
+14252,Use the java expression to query the first 'name' in the $t$ table where the id is $ID$ through the $conn$ connection and return the query result.,"public Object testLobsWithoutConvert(EntityManager db, Root<Object> t, Integer ID) {
+    CriteriaBuilder cb = db.getCriteriaBuilder();
+    CriteriaQuery<Object> cq = cb.createQuery(Object.class);
+    cq.select(t.get(""name"")).where(cb.equal(t.get(""id""), ID));
+    List<Object> rs = db.createQuery(cq).getResultList();
+    assert rs.size() > 0;
+    return rs.get(0);
+}"
+11041,Use $e$ to get the connection. Use the connection to execute the SQL (query the weather_cond information in airport_weather based on $airport$) and get all the data. Store the 0th element of each item in the query results in the list and return.,"public List<Object> getInf(DataSource e, String airport){
+    JdbcTemplate conn = new JdbcTemplate(e);
+    List<List> weat = conn.query(""select weather_cond from airport_weather where airport = ?"", new Object[]{airport}, new BeanPropertyRowMapper(List.class));
+    List<Object> results = new ArrayList<Object>();
+    for (List item : weat) {
+        results.add(item.get(0));
+    }
+    return results;
+}"
+13657,Set SQL (query the books table for review information where isbn is $isbn$). Execute the SQL using $connection$ and get all the data. Return the rendered 'profile.html' and pass the query results to the reviews parameter.,"public Object searchBook(JdbcTemplate connection, String isbn, Model model) {
+    String querys = ""select review from books where isbn = ?"";
+    List<Object> reviews = connection.query(querys, new Object[]{isbn},
+            new BeanPropertyRowMapper(List.class));
+    model.addAttribute(""reviews"", reviews);
+    return ""profile.html"";
+}"
+13147,"Execute the SQL (get the time column in the flights where password is $password$) with $conn$, get all the data, and finally return the rendered ""flights.html"" with the RES parameter as the result of the query.","public Object flights(JdbcTemplate conn, String password, Model model) {
+    String query = ""select time from flights where password = ?"";
+    List<Object> res = conn.query(query, new Object[]{password},
+            new BeanPropertyRowMapper(List.class));
+    model.addAttribute(""res"", res);
+    return ""flights.html"";
+}"
+13222,"Get the database connection from $testing$ , execute the SQL statement (query all columns in the table1) and get all the data. Convert each item in the query result into a list and return it as a list.","public Object search(DataSource testing){
+    JdbcTemplate con = new JdbcTemplate(testing);
+    List<List> results = con.query(""select * from table1"",
+            new BeanPropertyRowMapper(List.class));
+    return results;
+}"
+13877,"Try to use the java expression to set up SQL statement: Get customer_id data in the $parent_plots$ table based on $plotname$, use $conn$ connection to execute SQL statement and get all the data. Return all query results. If exception occurs, return the empty list.","public List<Object> getPlotCustomer(EntityManager e, Root<Object> parent_plots, String plotname) {
+    try {
+        CriteriaBuilder cb = e.getCriteriaBuilder();
+        CriteriaQuery<Object> cq=cb.createQuery(Object.class);
+        cq.select(parent_plots.get(""customer_id"")).where(cb.equal(parent_plots.get(""plotname""), plotname));
+        List<Object> customer_id  = e.createQuery(cq).getResultList();
+        return customer_id;
+    } catch (Exception exception) {
+        return new ArrayList();
+    }
+}"
+14003,"Connect to the database through $db_engine$. Execute the SQL statement (get all the columns in the customers table based on $username$ and $password$) and get the first piece of data to ensure that the database connection is closed. If the fetched data is empty, return None; otherwise, return the data corresponding to firstname and lastname in the query result.","public Object getCustomer(DataSource db_engine, String username, String password){
+    JdbcTemplate db_conn = new JdbcTemplate(db_engine);
+    Map ds = (Map) db_conn.query(""select * from customers where username = ? and password = ?"",
+                new Object[]{username, password}, new BeanPropertyRowMapper(List.class)).get(0);
+    if (ds == null) {
+        return null;
+    }
+    Map hashMap = new HashMap();
+    hashMap.put(""firstname"", ds.get(""firstname""));
+    hashMap.put(""lastname"", ds.get(""lastname""));
+    return hashMap;
+}"
+13942,"Set the SQL statement and the content is as follows: Query the duration data in the flights table where id is $id$, use the $conn$ connection to execute SQL, get all the data, convert each item of the query result into map, store it as list, and return.","public List<Object> selectDuration(JdbcTemplate conn, Integer id) {
+    String duration_sql = ""select duration from flights where id = ?"";
+    List<Object> durations = conn.query(duration_sql, new Object[]{id},
+            new BeanPropertyRowMapper(List.class));
+    List<Object> result = new ArrayList<Object>();
+    for(final Object row : durations){
+        result.add(new HashMap(){{put(""date"", row);}});
+    }
+    return result;
+}"
+13363,"Use the string matching method to set sql (query the otu_id column in the Samples table according to $date_now$), use $conn$ to execute SQL, use for loop to traverse all query results, store it as list and return.","public Object sampleJson(JdbcTemplate conn, String date_now) {
+    String query = ""select otu_id from Samples where date_now = "" + date_now;
+    List<Object> res = conn.query(query,
+            new BeanPropertyRowMapper(List.class));
+    List<Object> results = new ArrayList<Object>();
+    for (Object row : res) {
+        results.add(row);
+    }
+    return results;
+}"
+13608,"If the request is GET, the rendered 'index.html' is returned. If the request method is POST, execute the SQL using $db$ (querying user information in users where username is $logusername$ and whewre password is $logpassword$) and get the first data. Returns the rendered 'main.html', and pass the query result into the user parameter.","public Object login(HttpRequest request, JdbcTemplate db, String logusername, String logpassword, Model model) {
+    if(request.getMethod().equals(""GET"")){
+        return ""index.html"";
+    }
+    if(request.getMethod().equals(""POST"")){
+        List<Object> user = db.query(""select user from users where username = ? and password = ?"",
+                new Object[]{logusername, logpassword},
+                new BeanPropertyRowMapper(List.class));
+        model.addAttribute(""user"", user);
+    }
+    return ""main.html"";
+}"
+14004,"Step1: Executes the SQL statement through $db$: Query all the columns in the books table based on $book_id$ and get the first piece of data. Step2: Execute the SQL statement through $db$: Query all the columns in the 'reviews' table based on $book_id$ and get all the data. Render and return ""book.html"", where the book parameter is the query result of step1 and the 'reviews' parameter is the query result of step2.","public Object book(JdbcTemplate conn, Integer book_id, Model model) {
+    Object book = conn.query(""select * from books where book_id = ?"",
+            new Object[]{book_id},
+            new BeanPropertyRowMapper(List.class)).get(0);
+    List<Object> reviews = conn.query(""select * from reviews where book_id = ?"",
+            new Object[]{book_id},
+            new BeanPropertyRowMapper(List.class));
+    model.addAttribute(""book"", book);
+    model.addAttribute(""reviews"", reviews);
+    return ""book.html"";
+}"
+11132,"Set the SQL (query all data in the data_hist with the string $code$ through the format () function format string) , execute the SQL statement with $conn$ to get all the data, make sure the database connection is closed and return the query results.","public List<Object> refleshProfitPeaksBotts(JdbcTemplate conn, String code) {
+    String sql = ""select count(*) from data_hist where code = "" + code;
+    List<Object> infor = conn.query(sql,
+            new BeanPropertyRowMapper(List.class));
+    return infor;
+}"
+14041,Use $con$ to execute SQL: To query all rating data from the comments table and return the query results.,"public List<Object> main(JdbcTemplate conn) {
+    List<Object> res = conn.query(""select rating from comments"",
+            new BeanPropertyRowMapper(List.class));
+    return res;
+}"
+13183,"Execute SQL with $conn$ (get all columns in sqlalchemy where word is $word$) and get all data, then set the assertion query result not to be of type list, print the query result, and return the query result.","public List<Object> testQueryWithParameter(JdbcTemplate conn, String word) {
+    String query = ""select * from sqlalchemy where word = ?"";
+    List<Object> result =  conn.query(query, new Object[]{word},
+            new BeanPropertyRowMapper(List.class));
+    assert result.size() > 0;
+    System.out.println(result);
+    return result;
+}"
+11327,"Set up SQL (query the wallet_id column in the transaction_records table according to $id$), use $conn$ to execute the SQL to query the first row of data, and return empty if no data is queried; otherwise, return the queried data.","public Object getWalletByTx(JdbcTemplate conn, Integer id) {
+    String find_tx_sql_str = ""select wallet_id from transaction_records where id = "" + id;
+    Object data_query =  conn.query(find_tx_sql_str,
+            new BeanPropertyRowMapper(List.class)).get(0);
+    if (data_query == null) {
+        return null;
+    }
+    return data_query;
+}"
+14254,"Query the first 'name' in passengers table where flight_id is $flight_id$ through $conn$ , set assertion to determine that the length of the query result is not zero and return the query result.","public List<Object> flight(JdbcTemplate conn, Integer flight_id) {
+    List<Object> passenger =  conn.query(""select name from passengers where flight_id = ?"", new Object[]{flight_id},
+            new BeanPropertyRowMapper(List.class));
+    assert passenger.size() != 0;
+    return passenger;
+}"
+11443,"Query the first 'name' in passengers table where flight_id is $flight_id$ through $conn$ , set assertion to determine that the length of the query result is not zero and return the query result.","public List<Object> selectValue(JdbcTemplate conn, Integer id) {
+    String sql = ""select origin from flights where id = ?"";
+    List<Object> origins =  conn.query(sql, new Object[]{id},
+            new BeanPropertyRowMapper(List.class));
+    if (origins.size() == 0) {
+        System.out.println(""False"");
+    }
+    return origins;
+}"
+11671,"Use $db$ to execute SQL (get all the columns in the books table where book_name is $name$ and isbn is $id$), get all the data, and finally return the rendered ""index.html"", where the books parameter is the query result.","public Object getBooks(JdbcTemplate conn, String name, Integer id, Model model) {
+    List<Object> bs =  conn.query(""select * from books where book_name = ? and isbn = ?"", new Object[]{name, id},
+            new BeanPropertyRowMapper(List.class));
+    model.addAttribute(""books"", bs);
+    return ""index.html"";
+}"
+14111,"Execute SQL via $conn$: Query the first id in the user table based on $login$. If the query result exists, return it.","public Object okUser(JdbcTemplate conn, String login) {
+    Object my_user =  conn.query(""select id from user where login = ?"", new Object[]{login},
+            new BeanPropertyRowMapper(List.class)).get(0);
+    if (my_user != null) {
+        return my_user;
+    } else {
+    				return null;
+				}
+}"
+11624,"Try to use $conn$ to execute SQL (get all the columns in the db table according to values for $val$) and get the first row of data, return the query result. If an exception occurs during execution, print the exception and return False.","public Object getCommendationView(JdbcTemplate conn, Integer val) {
+    try {
+        Object result =  conn.query(""select * from db where values = ?"", new Object[]{val},
+                new BeanPropertyRowMapper(List.class)).get(0);
+        return result;
+    } catch(Exception e) {
+        e.printStackTrace();
+        return false;
+    }
+}"
+13518,"Use $conn$ to execute SQL according to the java expression (query all columns in the $ProfilesData$ table where FK_groups is $gid$) and get the first piece of data. If the query result is empty, return None; otherwise, return the query result.","public Object getProfileImagingServer(EntityManager conn, Root<Object> ProfilesData, Integer gid) {
+    CriteriaBuilder cb = conn.getCriteriaBuilder();
+    CriteriaQuery<Object> cq = cb.createQuery(Object.class);
+    cq.select(ProfilesData).where(cb.equal(ProfilesData.get(""gid""), gid));
+    List<Object> pdata = conn.createQuery(cq).getResultList();
+    if (pdata == null) {
+        return null;
+    }
+    return pdata.get(0);
+}"
+11619,"Use $conn$ to execute SQL (get the description column in the Images table where imageID is $imageId$), get all the data, and finally return the query result.","public List<Object> findDescription(JdbcTemplate conn, Integer imageId) {
+    List<Object> desc =  conn.query(""select description from Images where imageID = ?"", new Object[]{imageId},
+            new BeanPropertyRowMapper(List.class));
+    return desc;
+}"
+13408,"Use $tussl_test$ to get the database engine and connect to the database, then execute SQL (get column 'a' in the basic table with d as $time$) and get all the data, and finally set the assertion that the length of the query result is not 0","public void testBasicExecute(DataSource tussl_test, Object time){
+    JdbcTemplate engine = new JdbcTemplate(tussl_test);
+    String data_sql = ""select a from basic where d = ?"";
+    List<Object> results = engine.query(data_sql,
+            new Object[]{time},
+            new BeanPropertyRowMapper(List.class));
+    assert results.size() != 0;
+}"
+11655,"Use $db$ to execute SQL (get the year column in the books table based on $isbn$, $title$ and $author$). If the number of rows of the query result is 0, return the rendered ""error.html"", then obtain the first piece of data of the query result, and finally return the rendered ""results.html"", where the year parameter is the first data of the query result.","public Object searchYear(JdbcTemplate conn, String isbn, String title, String author, Model model) {
+    String query = ""select year from books where isbn = ? and title = ? and author = ?"";
+    List<Object> year =  conn.query(query, new Object[]{isbn, title, author},
+            new BeanPropertyRowMapper(List.class));
+    if (year.size() == 0) {
+        return ""error.html"";
+    }
+    model.addAttribute(""year"", year);
+    return ""results.html"";
+}"
+14288,"Execute the SQL statement with $con$: Query the largest duration in the flights table, get all the data, and return the obtained data.","public List<Object> main(JdbcTemplate con) {
+    List<Object> m_duration =  con.query(""select max(duration) from flights"",
+            new BeanPropertyRowMapper(List.class));
+    return m_duration;
+}"
+11107,"Use $conn$ to query all names in users where id is $id$. Render and return 'success.html', where the sender parameter is the name attribute of the query result.","public Object transactions(JdbcTemplate con, Integer id, Model model) {
+    List<Object> trans =  con.query(""select name from users where id = ?"", new Object[]{id},
+            new BeanPropertyRowMapper(List.class));
+    model.addAttribute(""sender"", trans.getClass().getName());
+    return ""success.html"";
+}"
+11681,"Use $db$ to execute SQL based on the java expression (get the origin column in the $flights$ table where destination is $dest$ and duration is $dur$) and get all the data. Finally, use for loop to convert each item of the query result to a list type and return.","public List<Object> getOrigin(EntityManager db, Root<Object> flights, Object dest, Object dur) {
+    CriteriaBuilder cb = db.getCriteriaBuilder();
+    CriteriaQuery<Object> cq = cb.createQuery(Object.class);
+    cq.select(flights.get(""origin"")).where(cb.equal(flights.get(""dest""), dest), cb.equal(flights.get(""dur""), dur));
+    List<Object> origins = db.createQuery(cq).getResultList();
+    return origins;
+}"
+14053,"Try to use $connection$ to use the java expression to set SQL: To get the categoryID data in $categories_table$ according to $name$, execute SQL to get the first piece of data and return. If Exception occurs, print the exception message and return.","public Object getCategoryByName(EntityManager connection, Root<Object> categories_table, String name) {
+    try {
+        CriteriaBuilder cb = connection.getCriteriaBuilder();
+        CriteriaQuery<Object> cq = cb.createQuery(Object.class);
+        cq.select(categories_table.get(""origin"")).where(cb.equal(categories_table.get(""name""), name));
+        Object result = connection.createQuery(cq).getResultList().get(0);
+        return result;
+    } catch (Exception e) {
+        e.printStackTrace();
+        return null;
+    }
+}"
+13361,"Use $dbcur$ to execute SQL (query the number of all columns in the information_schema table based on $table_name$) and return False, if the 0th element of the first row of data obtained is not equal to 1; otherwise, return the 0th element of the first row of data.","public Object checkTable(JdbcTemplate dbcur, String table_name) {
+    List<Object> res =  dbcur.query(""select count(*) from information_schema where table_name = ?"",
+            new Object[]{table_name},
+            new BeanPropertyRowMapper(List.class));
+    if (res.get(0).toString().equals(""1"")) {
+        return res.get(0);
+    } else {
+        return false;
+    }
+}"
+13268,"Get the database engine using $test$, execute the SQL (find all columns of $statuses$) through the database engine, get all the data, and print all the data using the for loop.","public void selectRun(EntityManager test, Root<Object> statuses) {
+    CriteriaBuilder cb = test.getCriteriaBuilder();
+    CriteriaQuery<Object> cq = cb.createQuery(Object.class);
+    cq.select(statuses);
+    List<Object> status = test.createQuery(cq).getResultList();
+    for (Object row : status) {
+        System.out.println(row);
+    }
+}"
+14177,"Set the SQL statement: Query all columns in the stocks_hist table with 'date' of $date$, and execute SQL to get all the data via $conn_hist$. If the obtained data is not empty, return.","public Object getSotcksHist(JdbcTemplate conn_hist, Object date) {
+    String rawsql = ""select * from stocks_hist where date = ?"";
+    List<Object> res =  conn_hist.query(rawsql,
+            new Object[]{date},
+            new BeanPropertyRowMapper(List.class));
+    if (res != null) {
+        return res;
+    }
+    else {
+    				return null;
+				}
+}"
+11358,Use $conn$ to execute SQL (query the first row of data in the osm column of the scripts table based on $functions$) and return the 0th element of the data.,"public Object osmaxxFunctions(JdbcTemplate conn, Object functions) {
+    List<Object> res =  conn.query(""select osm from scripts where functions = ?"",
+            new Object[]{functions},
+            new BeanPropertyRowMapper(List.class));
+    return res.get(0);
+}"
+13846,"Execute SQL statement through $conn$: Query statistical values of all columns in the apbd table based on $tahun$, $kode$ and $ref_kode$. Get the first piece of data and return the query results.","public Object dataFound(JdbcTemplate conn, String tahun, String kode, String ref_kode) {
+    Object res =  conn.query(""select count(*) from apbd where tahun = ? and kode = ? and ref_kode = ?"",
+            new Object[]{tahun, kode, ref_kode},
+            new BeanPropertyRowMapper(List.class)).get(0);
+    return res;
+}"
+13575,"Get the database engine and establish a connection through $postgresql$. Execute the SQL statement (query the message column in the articles table according to $title$), get all the data, close the connection. If the execution result is greater than 0, return the rendered ""articles.html"" page, where the parameter articles is the query result.","public Object articles(DataSource postgresql, String title, Model model){
+    JdbcTemplate engine = new JdbcTemplate(postgresql);
+    List<Object> result = engine.query(""select message from articles where title = ?"",
+            new Object[]{title},
+            new BeanPropertyRowMapper(List.class));
+    if (result.size() > 0) {
+        model.addAttribute(""articles"", result);
+    }
+    return ""articles.html"";
+}"
+11497,"Set up SQL (query all the information in the usersdata table based on $startDate$), execute SQL with $conn$ and get all the query results. Use for loop to convert each query result to map, and store it in list and return.","public Object selectValue(JdbcTemplate conn, String startDate) {
+    String query_sql = ""select * from usersdata where startDate = ?"";
+    List<Object> data = conn.query(query_sql,
+            new Object[]{startDate},
+            new BeanPropertyRowMapper(List.class));
+    List<Map> result = new ArrayList<>();
+    for (Object row : data) {
+        result.add((HashMap)row);
+    }
+    return result;
+}"
+13150,"Execute the SQL (get all the columns in the books where p1_index is $p1_index$) with $conn$ and get all the data, then return the rendered ""p1_index.html"" with the books parameter as the result of the query.","public Object books(JdbcTemplate conn, Integer p1_index, Model model) {
+    String query = ""select * from books where p1_index = ?"";
+    List<Object> res =  conn.query(query,
+            new Object[]{p1_index},
+            new BeanPropertyRowMapper(List.class));
+    model.addAttribute(""books"", res);
+    return ""p1_index.html"";
+}"
+13474,Execute SQL through $connection$ (get the gid column in the pg_prepared_xacts table) and get all the data. Then print the query results. Use for loop to store the 0th element of each item of the query results as list and finally return the list.,"public Object doRecoverTwophase(JdbcTemplate connection) {
+    List<List> res =  connection.query(""select gid from pg_prepared_xacts"",
+            new BeanPropertyRowMapper(List.class));
+    List<List> result = new ArrayList<>();
+    for (List row : res) {
+        result.add((List)row.get(0));
+    }
+    return result;
+}"
+14181,"Execute SQL via $conn$ connection (query all columns in books with isbn of $isbn_code$) to get the first piece of data, and return 0 if the data is empty; otherwise, returm the execution result of the mapionary type.","public Object api(JdbcTemplate connection, String isbn_code) {
+    Object res =  connection.query(""select * from books isbn = ?"",
+            new Object[]{isbn_code},
+            new BeanPropertyRowMapper(List.class)).get(0);
+    if (res == null) {
+        return null;
+    } else {
+        return (HashMap) res;
+    }
+}"
+14019,"In ORM, try to use $session$ to query the first piece of data in the $Comment$ table that the id is $c_id$ and return the query result. If an exception occurs, use 'raise' to throw the exception. Finally, make sure that $session$ is turned off.","public Object processComment(EntityManager session, Root<Object> Comment, Object c_id) {
+    try {
+        CriteriaBuilder cb = session.getCriteriaBuilder();
+        CriteriaQuery<Object> cq = cb.createQuery(Object.class);
+        cq.select(Comment).where(cb.equal(Comment.get(""c_id""), c_id));
+        Object matching_comment = session.createQuery(cq).getResultList().get(0);
+        return matching_comment;
+    } catch(Exception e) {
+        e.printStackTrace();
+        return null;
+    }
+}"
+14134,Set up an SQL statement: Query the LastUpdated data in the boxes table by $boxID$ and execute SQL to query all data via $conn$. For loop iterates through the query results and prints the 0th element of the query results.,"public void getLastUpdatedDate(JdbcTemplate conn, String boxID) {
+    String sql = ""select LastUpdated from boxes where boxID = ?"";
+    List<Object> result =  conn.query(sql,
+            new Object[]{boxID},
+            new BeanPropertyRowMapper(List.class));
+    for (Object row : result) {
+        System.out.println(((List)row).get(0));
+    }
+}"
+11223,"Try to set up SQL (get all columns in vw_muertes_estado based on $data_year$) and get all the data by $conn$ execution. Then store the query result as DataFrame format. After that convert the query result to mapionary type with 'records' as orient parameter. Finally use jsonify to  process the mapionary content and return. If there is an exception in the execution, print the exception string and finally make sure that $conn$ is closed.","public Object tellData(JdbcTemplate conn, String year) {
+					try {
+									String sql_select_Query = ""select * from vw_muertes_estado where data_year = ?"";
+									List<Object> res =  conn.query(sql_select_Query,
+																	new Object[]{year},
+																	new BeanPropertyRowMapper(List.class));
+									return new JSONArray(res);
+					} catch (Exception e) {
+									e.printStackTrace();
+									return null;
+					}
+	}"
+13344,"If $schema$ is empty, throw and execute an Exception, whose parameter is ""fail""; otherwise, obtain the database engine through $connection_string$. establish a connection. Use the format string matching method to set the sql statement (query all columns in the 'pg_tables' table based on the condition that schemaname is $schema$), execute the SQL statement, get all the data, and return the query results.","public List<Object> getPage(DataSource connection_string, String schema) {
+    if ("""".equals(schema)) {
+        throw new IllegalArgumentException(""fail"");
+    } else {
+        JdbcTemplate engine = new JdbcTemplate(connection_string);
+        List<Object> result = engine.query(""select * from pg_tables where schemaname = "" + schema,
+                new BeanPropertyRowMapper(List.class));
+        return result;
+    }
+}"
+11099,"Try to use $conn$ to execute SQL (query sponsor in user based on $plan$) and get all the data and return the query results. Finally, make sure the connection is closed.","public List<Object> basicFixture(JdbcTemplate conn, Object plan) {
+    List<Object> sponsor =  conn.query(""select sponsor from user where plan = ?"",
+            new Object[]{plan},
+            new BeanPropertyRowMapper(List.class));
+    return sponsor;
+}"
+13653,"Creating a database engine using $oracle$. Start a connection, and use the connection to execute the SQL (querying the team_name_abbr in the team based on $name$) and get the first data. Print element 0 in the query result.","public Object articles(DataSource oracle, String name) {
+    JdbcTemplate engine = new JdbcTemplate(oracle);
+    Object result = engine.query(""select team_name_abbr from team where name = ?"",
+            new Object[]{name},
+            new BeanPropertyRowMapper(List.class)).get(0);
+    return ((List) result).get(0);
+}"
+13162,"Execute the SQL using $db$ (get the book column in the tableh where linkValue is $link$) and get all the data, return the query results if the length of the query results is not 0.","public List<Object> initiateLinkSearch(JdbcTemplate conn, Object link) {
+    List<Object> links =  conn.query(""select book from tableh where linkValue = ?"",
+            new Object[]{link},
+            new BeanPropertyRowMapper(List.class));
+    if (links.size() != 0) {
+        return links;
+    } else {
+    				return null;
+				}
+}"
+11434,"Set SQL (query the lastname column in the User table based on $firstname$), use $conn$ to execute SQL and get all the query results. Set assertion to determine whether the query results are empty, and return the query results.","public List<Object> testBulk(JdbcTemplate conn, String firstname) {
+    String sql = ""select lastname from User where firstname = ?"";
+    List<Object> results =  conn.query(sql,
+            new Object[]{firstname},
+            new BeanPropertyRowMapper(List.class));
+    assert results != null;
+    return results;
+}"
+13996,"Set the SQL statement: Query all the columns in the data table according to $date$, use $conn$ to execute SQL to get all the data, and return the 0th element of the execution result.","public Object getCodeByDate(JdbcTemplate conn, Object date) {
+    String sql_data = ""select * from data where date = ?"";
+    List<Object> records =  conn.query(sql_data,
+            new Object[]{date},
+            new BeanPropertyRowMapper(List.class));
+    return records.get(0);
+}"
+11238,"If use $conn$ to execute SQL (get all the columns in users based on $username$) and the result of the number of rows is 0, return rendered ""message_layout.html"" and pass ""Not Registered"" into the message parameter. Otherwise return rendered ""message_layout.html"", and pass ""Succesfuly Logged In!"" into the message parameter. ","public Object login(JdbcTemplate conn, String username, Model model) {
+    List<Object> results =  conn.query(""select * from users where username = ?"",
+            new Object[]{username},
+            new BeanPropertyRowMapper(List.class));
+    if (results.size() == 0) {
+        model.addAttribute(""message"", ""Not Registered!"");
+    } else {
+        model.addAttribute(""message"", ""Succesfuly Logged In!"");
+    }
+    return ""message_layout.html"";
+}"
+14187,"Set the SQL with the following content: Get the salary data in the jobs table based on $company$, execute the SQL to get all the data via $conn$, and return all the obtained data.","public List<Object> processItem(JdbcTemplate conn, Object company) {
+    String sql= ""select salary from jobs where company = ?"";
+    List<Object> data =  conn.query(sql,
+            new Object[]{company},
+            new BeanPropertyRowMapper(List.class));
+    return data;
+}"
+13131,"Execute the SQL (get all the columns in the test_frame3_legacy where id is $id$) with $conn$, get all the data, then close the $conn$ connection, and return the query results.","public List<Object> testSqlOpenClose(JdbcTemplate conn, Object id) {
+    String sql= ""select * from test_frame3_legacy where id = ?"";
+    List<Object> res =  conn.query(sql,
+            new Object[]{id},
+            new BeanPropertyRowMapper(List.class));
+    return res;
+}"
+14142,"Create a database engine and establish a connection via $db_name$. Execute SQL: Query the user information in the db_name table based on $password$, get the first piece of information, and return the obtained information.","public Object getitems(DataSource db_name, String password) {
+    JdbcTemplate engine = new JdbcTemplate(db_name);
+    Object items = engine.query(""select user from db_name where password = ?"",
+            new Object[]{password},
+            new BeanPropertyRowMapper(List.class)).get(0);
+    return items;
+}"
+11533,"Execute the SQL statement (query all columns in the favorites table based on $name$ and $city$) through $conn$, get all the data and convert each item into map and store it as list and return it. If there is an exception, then print ""Error"".","public List<Map> queryFavorites(JdbcTemplate conn, String name, String city) {
+    try {
+        List<Object> query =  conn.query(""select * from favorites where name = ? and city = ?"",
+                new Object[]{name, city},
+                new BeanPropertyRowMapper(List.class));
+        List<Map> results = new ArrayList<>();
+        for (Object row : query) {
+            results.add((HashMap) row);
+        }
+        return results;
+    } catch (Exception e) {
+        System.out.println(""Error"");
+        return null;
+    }
+}"
+14258,"Connect to the database through $engine$. Execute SQL: Query the maximum 'price' in the crypto table and get the first piece of data. Convert each item of the query result to map, store as list and return.","public List<Map> stations(DataSource engine) {
+    JdbcTemplate conn = new JdbcTemplate(engine);
+    List<Object> query = conn.query(""select max(price) from crypto"",
+            new BeanPropertyRowMapper(List.class));
+    List<Map> results = new ArrayList<>();
+    for (Object row : query) {
+        results.add((HashMap) row);
+    }
+    return results;
+}"
+13767,"Set SQL based on the java expression (query all columns in the $Line$ table based on $line_cd$). Execute SQL through $conn$, get all the data, use for loop to traverse each query result, store it as list, and finally return the list.","public List<Object> joinData(EntityManager conn, Root<Object> line, Object line_cd) {
+    CriteriaBuilder cb = conn.getCriteriaBuilder();
+    CriteriaQuery<Object> cq = cb.createQuery(Object.class);
+    cq.select(line).where(cb.equal(line.get(""line_cd""), line_cd));
+    List<Object> known_line_cd = conn.createQuery(cq).getResultList();
+    return known_line_cd;
+}"
+11295,"Set up SQL (get all columns in 'drinkers' based on $rawdata$), try to execute with $conn$ and get all the data. Return the query result, and if an exception occurs during execution, return False.","public Object writeLocalDb(JdbcTemplate conn, Object rawdata) {
+    try {
+        String query = ""select * from drinkers where rawdata = ?"";
+        List<Object> rs =  conn.query(query,
+                new Object[]{rawdata},
+                new BeanPropertyRowMapper(List.class));
+        return rs;
+    } catch (Exception e) {
+        return false;
+    }
+}"
+11038,"Step 1: Use $db$ to execute SQL (query all columns in userss based on $id$) and get the first piece of data. Setp 2: Use $db$ to execute SQL (query all columns in userss) and get all the data. Pass the query result of step 1 to the user parameter, and the query result of step 2 to the users parameter, return and render the ""profile.html"" page.","public Object profile(JdbcTemplate conn, String id, Model model) {
+    Object user =  conn.query(""select * from users where id = ?"",
+            new Object[]{id},
+            new BeanPropertyRowMapper(List.class)).get(0);
+    List<Object> users =  conn.query(""select * from users"",
+            new BeanPropertyRowMapper(List.class));
+    model.addAttribute(""user"", user);
+    model.addAttribute(""users"", users);
+    return ""profile.html"";
+}"
+11430,"Get the database engine by $DB_DOMAIN$ with 'echo' parameter as False and establish a connection. Set SQL statement (query all columns in test0 table based on $value$), execute sql, get all the data, and return the query result.","public List<Object> test0Db(DataSource DB_DOMAIN, String value) {
+    JdbcTemplate conn = new JdbcTemplate(DB_DOMAIN);
+    String sql = ""select * from test0 where value = ?"";
+    List<Object> results = conn.query(sql,
+            new Object[]{value},
+            new BeanPropertyRowMapper(List.class));
+    return results;
+}"
+13172,"Execute the SQL (get the type column in the table where engine is $engine$) using $db$, get all the data, and return the query results.","public List<Object> testToSql(JdbcTemplate db, Object engine) {
+    List<Object> rows =  db.query(""select type from table where engine = ?"",
+            new Object[]{engine},
+            new BeanPropertyRowMapper(List.class));
+    return rows;
+}"
+11462,"Set up SQL (query all the information in the flights table based on $id$), use $conn$ to execute SQL and get the first piece of data. If the query result is empty, return the rendered ""error.html"" page with 'message' as ""No such flight. Otherwise, return the rendered ""flight.html"", and the flight parameter is the query result.","public Object flight(JdbcTemplate conn, Object id, Model model) {
+    String flight_sql = ""select * from flights where id = ?"";
+    Object flight =  conn.query(flight_sql,
+            new Object[]{id},
+            new BeanPropertyRowMapper(List.class)).get(0);
+    if (flight == null) {
+        model.addAttribute(""message"", ""No such flight."");
+        return ""error.html"";
+    } else {
+        model.addAttribute(""flight"", flight);
+        return ""flight.html"";
+    }
+}"
+14014,connect to the database according to $engine$. Execute the SQL statement (query all customer_name and customer_des information in the customer table) and return the query result.,"public List<Object> queryCaching(DataSource engine) {
+    JdbcTemplate conn = new JdbcTemplate(engine);
+    List<Object> results = conn.query(""select customer_name, customer_des from customer"",
+            new BeanPropertyRowMapper(List.class));
+    return results;
+}"
+13151,"Try to use $conn$ to execute SQL (get the ID and DNI columns in the users where id is $dni$) and get the first data, then return the query results and finally make sure the $conn$ connection is closed.","public Object users(JdbcTemplate conn, Object dni) {
+    Object cur =  conn.query(""select id, dni from users where id = ?"",
+            new Object[]{dni},
+            new BeanPropertyRowMapper(List.class)).get(0);
+    return cur;
+}"
+13169,"Execute the SQL with $conn$ (get the id column in the name where staff_position.id is $id$ and name.id is $id $) and get the first data, then return the query results.","public Object whereClauseFn(JdbcTemplate conn, Object id) {
+    String stmt = ""select id from name where staff_position.id = ? and name.id = ?"";
+    Object res =  conn.query(stmt,
+            new Object[]{id, id},
+            new BeanPropertyRowMapper(List.class)).get(0);
+    return res;
+}"
+14263,"Try to use the Java expression to execute the SQL statement through the $conn$ connection: Query all the contents of the $ServiceV4$ table where id is $pk_id$ and return the query results. If there is an Exception, use 'raise' to throw an exception based on the error message.","public List<Object> updateServiceRowsByIds(EntityManager conn, Root<Object> ServiceV4, Object pk_id) {
+    try {
+        CriteriaBuilder cb = conn.getCriteriaBuilder();
+        CriteriaQuery<Object> cq = cb.createQuery(Object.class);
+        cq.select(ServiceV4).where(cb.equal(ServiceV4.get(""pk_id""), pk_id));
+        List<Object> model_obj = conn.createQuery(cq).getResultList();
+        return model_obj;
+    } catch (Exception e) {
+        throw new IllegalArgumentException(e);
+    }
+}
+"
+11416,"Use 'with' statement to connect to the database based on $engine$. Set up SQL (query all columns in the MasterSells table based on Price $max_price$), execute SQL and get all the query results. Use for loop to convert each query result to map, and store in list. Use for loop to convert the 'Price' field in the query result to float format. Finally, return the list.","public List<Map> filterBeers(DataSource engine, float max_price) {
+    JdbcTemplate conn = new JdbcTemplate(engine);
+    String query = ""select * from MasterSells where Price = ?"";
+    List<Map> rs = conn.query(query,
+            new Object[]{max_price},
+            new BeanPropertyRowMapper(List.class));
+    List<Map> results = new ArrayList<>();
+    for (Object row : rs) {
+        results.add((HashMap)row);
+    }
+    for (Map map : results) {
+        float price = (float)map.get(""Price"");
+        map.put(""Price"", price);
+    }
+    return results;
+}"
+11646,"Use $conn$ to execute SQL (get the 'the_class' column in the context table according to $id$) and get the first piece of data. If the query result is true, return the query result; otherwise, return None.","public Object getClass(JdbcTemplate conn, Object id) {
+    Object row =  conn.query(""select the_class from context where id = ?"",
+            new Object[]{id},
+            new BeanPropertyRowMapper(List.class)).get(0);
+    if (row == null) {
+        return null;
+    } else {
+        return row;
+    }
+}
+"
+13839,"If the request module sends request as post, use $conn$ to create cursor object, execute SQL statement by cursor: Query the first piece of owner data in the houses table based on $id$. Close the cursor, render and return ""house.html"", where the owner parameter is the query result; otherwise use redirect to return the 'homepage' spliced by url_for.","public Object house(HttpRequest request, JdbcTemplate conn, Object id, Model model) {
+    if(request.getMethod().equals(""GET"")){
+        return ""house.html"";
+    }
+    if(request.getMethod().equals(""POST"")){
+        Object rs = conn.query(""select owner from houses where id = ?"",
+                new Object[]{id},
+                new BeanPropertyRowMapper(List.class)).get(0);
+        model.addAttribute(""owner"", rs);
+    }
+    return ""house.html"";
+}"
+11580,"Use $conn$ to execute the SQL statement (query all the columns in the flights table based on $id$), get all the data, render and return ""index.html"", where the flights parameter is the query result.","public Object index(JdbcTemplate conn, Object id, Model model) {
+    Object info =  conn.query(""select * from flights where id = ?"",
+            new Object[]{id},
+            new BeanPropertyRowMapper(List.class));
+    model.addAttribute(""flights"", info);
+    return ""index.html"";
+}"
+11012,Establish database engine based on $db_address$ and set echo parameter to False. Get a connection based on engine. Execute SQL (query all columns in winlotto table based on $win_id$) and get query results. Close the link and return the query results.,"public List<Object> winlottoSel(DataSource db_address, Object win_id) {
+    JdbcTemplate conn = new JdbcTemplate(db_address);
+    List<Object> winlotto = conn.query(""select * from winlotto where win_id = ?"",
+            new Object[]{win_id},
+            new BeanPropertyRowMapper(List.class));
+    return winlotto;
+}"
+11114,Connect to the database with $db$. Execute the SQL statement(query the inf in the users where based on $id_tu$) and return all query results.,"public Object testFlush(DataSource db, Object id_tu){
+        JdbcTemplate c = new JdbcTemplate(db);
+        List<Object> flush = c.query(""select inf from users where id_tu= ?"", new Object[]{id_tu},
+            new BeanPropertyRowMapper(List.class));
+        return flush;
+    }"
+13600,"Use $testing$ to establish a connection, execute SQL (query all columns in the deadlock_users table based on $user_id$), get all the query results, close the connection, and return the query results.","public Object testRollbackDeadlock(DataSource testing, Integer user_id){
+        JdbcTemplate conn1 = new JdbcTemplate(testing);
+        List<Object> res = conn1.query(""select * from deadlock_users where user_id = ?"", new Integer[]{user_id},
+            new BeanPropertyRowMapper(List.class));
+        return res;
+    }"
+14037,"Use $conn$ to query all the columns in the flights table, get all the data, render and return ""index.html"", where the flight parameter is the query result.","public String index(Model model, JdbcTemplate conn) {
+        List flights = conn.queryForList(""select * from flights"");
+        model.addAttribute(""flights"", flights);
+        return ""index.html"";
+    }"
+11166,Execute the SQL statement (get all the data in $Contact$ where id is $id$) using ORM over the $conn$ connection to print all the query results.,"    public void getContactyById(JdbcTemplate conn, String Contact, Integer id) {
+        List<Map<String, Object>> values = conn.queryForList(Contact);
+        for (Map value : values) {
+            if (value.get(""id"") == id) {
+                System.out.println(value);
+            }
+        }
+    }"
+14174,"Use java expression to set up SQL statement (get p in $table$ table based on $q$), execute SQL by $conn$ to get all the data and return.","public Object testAppendCorrelation(EntityManager conn, Root<Object> table, Object q){
+        CriteriaBuilder cb = conn.getCriteriaBuilder();
+        CriteriaQuery<Object> cq = cb.createQuery(Object.class);
+        cq.select(table).where(cb.equal(table.get(""q""), q));
+        Object res = conn.createQuery(cq).getResultList();
+        return res;
+    }"
+11599,"connect the database according to $engine$. Execute the SQL statement (get the statistics of all the columns in the Bills table based on $type$), get all the data, convert each item of the query result to dict, store it as list and return.","public Object getData(DataSource engine, Object type){
+    JdbcTemplate connection = new JdbcTemplate(engine);
+    List<Object> rs = connection.query(""select count(*) from Bills where type = ?"", new Object[]{type},
+            new BeanPropertyRowMapper(List.class));
+    List<Object> results = new ArrayList<Object>();
+    for(Object result:rs){
+        results.add(new HashMap(){{put(""type"", result);}});
+    }
+    return results;
+}"
+13921,"Try to set the SQL statement with the Java expression (query the cookie_id in the $cookies$ table through $quantity$), use the $conn$ connection to execute SQL, get all the data, and return the obtained data. If there is an Exception, print exception message.","public Object shipIt(EntityManager conn, Root<Object> cookies, Object quantity){
+        try{
+            CriteriaBuilder cb = conn.getCriteriaBuilder();
+            CriteriaQuery<Object> cq = cb.createQuery(Object.class);
+            cq.select(cookies).where(cb.equal(cookies.get(""quantity""), quantity));
+            Object cookies_to_ship = conn.createQuery(cq).getResultList();
+            return cookies_to_ship;
+        }
+        catch (Exception e){
+            System.out.println(e.getMessage());
+            return null;
+        }
+    }"
+13292,Use $conn$ to execute SQL (get the name column in the Campground) to get all the data and print each item in the query result using the for loop.,"public void searchName(JdbcTemplate conn){
+        List<Map<String, Object>> cities = conn.queryForList(""select name from Campground"");
+        for (Object city : cities) {
+            System.out.println(city);
+        }
+    }"
+13541,"Open the $input_file$ file, read the file, execute the 'next' command, traverse the title in the file and connect the database according to $db$. Execute SQL (query all columns in the books table according to title), get all the query results and print them.","    public void readCsv(JdbcTemplate db, String input_file) {
+				try (BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(new FileInputStream(input_file)))) {
+								String line;
+								while ((line = bufferedReader.readLine()) != null) {
+												List<Object> res = db.query(""SELECT * FROM books WHERE title = ?"", new Object[]{line},
+																				new BeanPropertyRowMapper<>(Object.class));
+												System.out.println(res);
+								}
+				} catch (IOException e) {
+								e.printStackTrace();
+				}
+}"
+14067,"Use $conn$ to execute the SQL statement (query all id data in the flights table), use for loop traversal to query the results and print, set assertions to determine that the length of the returned result is greater than 0.","public void main(JdbcTemplate conn) {
+        List<Map<String, Object>> flights = conn.queryForList(""select id from flights"");
+        for (Object flight : flights) {
+            System.out.println(flight);
+        }
+        assert flights.size() > 0;
+    }"
+11102,Try to use $conn$ to execute SQL (query all ids in the localtable where the id of parent is $parent_id$) and return all results.,"public Object testReflectAltOwnerSynonyms(JdbcTemplate conn, Integer parent_id){
+        Object texts = conn.query(""select id from localtable where parent_id = ?"", new Integer[]{parent_id},
+                new BeanPropertyRowMapper(List.class));
+        return texts;
+    }"
+13300,"Print $intcol$, execute SQL with $conn$ (get the numericcol column in t1 where intcol is $intcol$) , get all the data and return.","public Object testNumerics(JdbcTemplate conn, Object intcol){
+        System.out.println(intcol);
+        String sql = ""select numericcol from t1 where intcol = ?"";
+        Object results = conn.query(sql, new Object[]{intcol},
+                new BeanPropertyRowMapper(List.class));
+        return results;
+    }"
+13644,Set SQL: query the id information in the item_info table where name is $keywords$. Execute the SQL using $session$ and get all the data. Close $session$ and return each item in the query result as map.,"public Object getKeywords(JdbcTemplate session, Object keywords){
+    List<Object> rs = session.query(""select id from item_info where name = ?"", new Object[]{keywords},
+            new BeanPropertyRowMapper(List.class));
+    List<Object> results = new ArrayList<Object>();
+    for(Object result:rs){
+        results.add(new HashMap(){{put(""id"", result);}});
+    }
+    return results;
+}"
+13857,"Use $connect_str$ to get the database engine, where the echo parameter is False. Bind the database engine. Set SQL statement: Query names data in tables through $schema$, execute SQL to get all the data. Convert each item of the query results into map and store it as list and return it.","public Object getAllTableNames(DataSource connect_str, Object schema){
+    JdbcTemplate engine = new JdbcTemplate(connect_str);
+    List<Object> rs = engine.query(""select names from tables where schema = ?"", new Object[]{schema},
+            new BeanPropertyRowMapper(List.class));
+    List<Object> results = new ArrayList<Object>();
+    for(Object result:rs){
+        results.add(new HashMap(){{put(""name"", result);}});
+    }
+    return results;
+}"
+13676,"Create the database engine from $proxy$ and set the echo parameter to False. Create a connection using the engine. Set the SQL (queries for the hostname in the Table where IP is $ip$, id is $id$, and location is $location$). Try Out SQL with $conn$ and get the first data and return the query results. If an exception occurs, the information for the specific exception is printed.","public Object main(DataSource proxy, Object ip, Object id, Object location){
+        JdbcTemplate engine = new JdbcTemplate(proxy);
+        try{
+            List<Object> result = engine.query(""select hostname from Table where ip = ? and id = ? and location = ?"", new Object[]{ip, id, location},
+                    new BeanPropertyRowMapper(List.class));
+            return result;
+
+        }
+        catch (Exception e){
+            System.out.println(e.getMessage());
+            return null;
+        }
+    }"
+13662,"Open the""books.csv"" and use reader to process the file. For each item of data in the file, execute the SQL using $db$ (query the year in the books table where isbn is the data in the file) and store the first query result in the list. Finally, return the whole list.","    public List<Object> getYear(JdbcTemplate db) {
+        List<Object> resultList = new ArrayList<>();
+        try (BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(new FileInputStream(""books.csv"")))) {
+            String line;
+            while ((line = bufferedReader.readLine()) != null) {
+                List<Object> res = db.query(""SELECT year FROM books WHERE isbn = ?"", new Object[]{line},
+                        new BeanPropertyRowMapper<>(Object.class));
+                if (!res.isEmpty()) {
+                    resultList.add(res.get(0));
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return resultList;
+    }"
+11253,"Connect to the database via $engine$, try to execute the SQL (get all the columns in the database based on $name$), get all the data and then return the query result.If an exception occurs during the execution, print the exception print and finally make sure the connection is closed.","    public Object initialize(DataSource engine, String name){
+        JdbcTemplate connection = new JdbcTemplate(engine);
+        Object res = null;
+        try{
+            res = connection.query(""select * from database where name = ?"", new String[]{name},
+                    new BeanPropertyRowMapper(List.class));
+        }
+        catch (Exception ex){
+            System.err.println(ex);
+        }
+        return res;
+    }"
+14242,"Use $conn$ to query all the fname in the tuser table whose pwd is $pwd$, print the query result, and return the query result if the length of the query result is greater than 0.","public Object query(JdbcTemplate conn, String pwd){
+        Object res = conn.query(""select fname from tuser where pwd = ?"", new String[]{pwd},
+                    new BeanPropertyRowMapper(List.class));
+        System.out.println(res);
+        return res;
+    }"
+13934,"If the request module sends the request in a POST method, try to use the $conn$ connection to execute the SQL statement (get the first user_name in the Reviews table based on $user$ and $isbn$), render and return ""bookinfo.html"", where the review parameter is the obtained data. If an exception occurs, return False.","public Object bookInfo(HttpRequest request, Model model, JdbcTemplate conn, Object user, Object isbn) {
+    if(request.getMethod().equals(""POST"")) {
+        try {
+            Object information = conn.query(""select user_name from Reviews where user_name = ? AND isbn = ?"", new Object[]{user, isbn},
+                    new BeanPropertyRowMapper(List.class));
+            model.addAttribute(""username"", information);
+        } 
+        catch (Exception e) {
+            return false;
+        }
+    }
+    return ""bookinfo.html"";
+}"
+11312,"Use $conn$ to execute SQL (query the nlast column in the stock_fund_holdings table based on $code$ and $date$), get all the data, and use $conn$ to submit it. And output the query results.","public void fetchFundHoldings(JdbcTemplate conn, Object code, Object date){
+    Object cur = conn.query(""select nlast from stock_fund_holdings where code = ?, date = ?"", new Object[]{code, date},
+            new BeanPropertyRowMapper(List.class));
+    System.out.println(cur);
+}"
+13155,"According to the java expression, execute SQL with $conn$ (Get the data for the count limit of $count$ in the $table$) and get all the data, then print the query results and return the query results.","    public List databaseOutput(EntityManager conn, Root<Object> table, Integer count){
+				CriteriaBuilder cb = conn.getCriteriaBuilder();
+				CriteriaQuery<Object> cq = cb.createQuery(Object.class);
+				cq.select(table);
+				List<Object> tableOutput = conn.createQuery(cq).getResultList();
+				tableOutput = tableOutput.subList(0, count);
+				System.out.println(tableOutput);
+				return tableOutput;
+}"
+11432,"Set SQL (query the status column in 'orders' table based on the $customerid$ which is converted to a string), use $conn$ to execute the SQL and get all the query results, and return the results of the execution statement.","public Object setOrderStatusPaid(JdbcTemplate conn, Integer customerid){
+    String query = ""select status from orders where customerid = ?"";
+    Object stauts = conn.query(query, new Integer[]{customerid},
+            new BeanPropertyRowMapper(List.class));
+    return stauts;
+}"
+13197,"Execute the SQL (get the customerid column in the customers table processed by the count method where the name of user is $username$) with $conn$, get all the data, then use the for loop to convert each item of the query result to a list type, and finally return the list content.","public Object getNumberUsersWithUsername(JdbcTemplate conn, Object username){
+    Object inforauto = conn.query(""select count(customerid) from customers where username = ?"", new Object[]{username},
+            new BeanPropertyRowMapper(List.class));
+    return inforauto;
+}"
+11678,"Use $engine$ to connect the database and execute SQL (get the UID column in the USER_LIST table whose LID is $lid$), get all the data, close the connection, and finally return the query result.","public Object getUserid(DataSource engine, Integer lid){
+    JdbcTemplate connection = new JdbcTemplate(engine);
+    Object uids = connection.query(""select UID from USER_LIST where LID = ?"", new Integer[]{lid},
+            new BeanPropertyRowMapper(List.class));
+    return uids;
+}"
+11141,"Set the SQL (query all autoload in $devices$ where metadata is $metadata$) , execute the SQL using the $connection$ and fetch the data.","public Object opendb(JdbcTemplate connection, Object metadata){
+    String sql = ""select autoload from devices where metadata = ?"";
+    Object inforauto = connection.query(sql, new Object[]{metadata},
+            new BeanPropertyRowMapper(List.class));
+    return inforauto;
+}"
+11167,"If the request module sends the request as GET, render and return ""register.html"". Otherwise execute the SQL (query all columns in users where the state of login is $login_state$) over the $conn$ connection and get the first data, return the obtained data.","public Object register(HttpRequest request, Model model, JdbcTemplate conn, Object login_state) {
+        if(request.getMethod().equals(""GET"")) {
+            return ""register.html"";
+        }
+        else{
+            Object information = conn.query(""select * from users where login_state= ?"", new Object[]{login_state},
+                    new BeanPropertyRowMapper(List.class));
+            return information;
+        }
+    }"
+13537,"Execute SQL with $db$ (query all columns in the usuarios table according to $id_user$), get the first row of data, return the rendered ""main.html"", and set the parameter name to the 0th element of the query result.","public String login(JdbcTemplate db, Integer id_user, Model model){
+        List<Object> users = db.query(""select * from usuarios where id_user = ?"", new Integer[]{id_user},
+                new BeanPropertyRowMapper(List.class));
+        model.addAttribute("" name "", users.get(0));
+        return ""main.html"";
+    }"
+11126,"Try to execute the SQL statement using the $conn$ connection: query all the columns in the photos where time_oj is $time_oj$ and get all the data. Store the 0th element of each item of the query result as a list and return it. If an Exception occurs during execution, the Exception information is printed.","    public List<Object> emptyQuery(JdbcTemplate conn, Object time_oj){
+        try{
+            List<List> infor = conn.query(""select * from photos where time_oj = ?"", new Object[]{time_oj},
+                    new BeanPropertyRowMapper(List.class));
+            List<Object> results = new ArrayList<Object>();
+            for(List result:infor){
+                results.add(new HashMap(){{put(""photos"", result.get(0));}});
+            }
+            return results;
+        }
+        catch (Exception e){
+            System.out.println(e.getMessage());
+            return null;
+        }
+    }"
+13065,Use $testing$ to get the database connection. Use the connection to execute SQL (query all columns in the query_users table) and get all the data. Close the connection and return the query results.,"public Object testClose2(DataSource testing){
+        JdbcTemplate connection = new JdbcTemplate(testing);
+        List<Object> users_value = Collections.singletonList(connection.queryForList(""select * from query_users""));
+        return users_value;
+    }"
+11073,Use the java expression to set up SQL (query all the information in the $queue_table$ table based on $insertion_time$). Returns all the data of the query executed with $conn$.,"public List getFromInsertion(EntityManager conn, Root<Object> queue_table, Object insertion_time){
+        CriteriaBuilder cb = conn.getCriteriaBuilder();
+        CriteriaQuery<Object> cq = cb.createQuery(Object.class);
+        cq.select(queue_table).where(cb.equal(queue_table.get(""insertion_time""), insertion_time));
+        List<Object> s = conn.createQuery(cq).getResultList();
+        return s;
+    }"
+13331,"connect the database according to $engine$. Execute SQL (query the drinker column in the Transactions table according to $transactionID$), get all the query results, convert each item of the query result to map, store it as list, and return.","public List<Object> queryPage(DataSource engine, Integer transactionID){
+        JdbcTemplate connection = new JdbcTemplate(engine);
+        List<Object> rs = connection.query(""select drinker from Transactions where transactionID = ?"", new Integer[]{transactionID},
+                new BeanPropertyRowMapper(List.class));
+        List<Object> results = new ArrayList<Object>();
+        for(Object row:rs){
+            results.add(new HashMap(){{put(""name"", row);}});
+        }
+        return results;
+    }"
+11512,"Execute SQL through $conn$ (query all columns in secrets table based on $id$) and get all data. Use for loop iterate the query results, convert the 0th element of each item in the query results to a string and store it in list. Return all the query results.","public Object test(JdbcTemplate conn, Integer id){
+        List<List> results = conn.query(""select * from secrets where id = ?"", new Integer[]{id},
+                new BeanPropertyRowMapper(List.class));
+        List<Object> secret_list = new ArrayList<Object>();
+        for(List item: results){
+            secret_list.add(item.get(0).toString());
+        }
+        return results;
+    }"
+13591,"Execute SQL with $conn$ (query the isbn and author columns in the books table according to $title$) and return the rendered ""error.html"" page if the rowcount field of the execution result is 0. Get all the results of the execution statement and return the rendered ""results.html"" page, where the parameter books is the obtained data.","public String search(Model model, JdbcTemplate conn, Object title){
+        List<Object> rows = conn.query(""select isbn, author from books where title = ?"", new Object[]{title},
+            new BeanPropertyRowMapper(List.class));
+        if (rows == null) {
+            return ""error.html"";
+        }
+        else {
+            model.addAttribute(""books"", rows);
+            return ""results.html"";
+        }
+    }"
+13955,"Connect the database with $engine$ and set the SQL statement: Query all columns in the tablename table based on $value$. Try to execute the SQL statement, get all the data, and convert each item of the query result into map and store it into list. If an Exception occurs, use raise to throw an exception based on the error message. Finally, close the database connection and release the resources consumed by the connection. Return the list content.","public List<Object> selectValue(DataSource engine, Object values){
+        JdbcTemplate connection = new JdbcTemplate(engine);
+        String sql = ""select * from tablename where value = ?"";
+        try{
+            List<Object> result = connection.query(sql, new Object[]{values},
+                    new BeanPropertyRowMapper(List.class));
+            List<Object> rows = new ArrayList<Object>();
+            for(final Object row : result){
+                rows.add(new HashMap(){{put(""date"", row);}});
+            }
+            return rows;
+        }
+        catch (Exception error){
+            System.out.println(error.getMessage());
+            return null;
+        }
+    }"
+11402,Use $conn$ to execute SQL (query the number of all columns in the collisions table) and get all the query results. Use for loop to convert each query result into a string and connect it with 'join'. Return the obtained concatenate string.,"    public List<Object> viewdb(JdbcTemplate conn){
+        List<Object> rows = Collections.singletonList(conn.queryForList(""select count(*) from collisions""));
+        return rows;
+    }"
+13224,Execute the SQL statement (query all columns in the stock where id is $id$) using $conn$ and get all the data. Use the for loop to print the 0th element of each item in the query result.,"public List<Object> selectStock(JdbcTemplate conn, Integer id){
+        String sql = ""select * from stock where id = ?"";
+        List<Object> results = conn.query(sql, new Integer[]{id},
+                new BeanPropertyRowMapper(List.class));
+        for(int i = 0; i < results.size(); i++){
+            System.out.println(results.get(i));
+        }
+        return results;
+    }"
+11045,"Get information through search_string in request. If the data is obtained, use $conn$ to execute SQL: To get all the title data in the books_table based on $author$. Print the query results and return.","    public List<Object> search(String search_string, JdbcTemplate conn, String author){
+        List<Object> books = null;
+        if(search_string != null){
+            books = conn.query(""select title from books_table where author=?"", new String[]{author},
+                    new BeanPropertyRowMapper(Object.class));
+            System.out.println(books);
+        }
+        return books;
+    }"
+11158,"Set the SQL to query all user_id in $ic_user_session$ where session_hash is $session_hash$) , execute the SQL with $conn$ and return the acquired data.","public List queryPage(JdbcTemplate conn, String session_hash){
+    String s = ""select user_id from ic_user_session where session_hash = "" + session_hash;
+    List res = conn.query(s, new BeanPropertyRowMapper(List.class));
+    return res;
+}"
+11570,"Use the $conn$ connection to execute SQL (query all columns in the pay_newitem table through $barcode$) and get all the data, use "" to connect the query results and return.","    public List<Object> messageProcessor(JdbcTemplate conn, String barcode){
+        String sql = ""select * from pay_newitem where barcode = ?"";
+        List<Object> result = conn.query(sql, new String[]{barcode},
+                new BeanPropertyRowMapper(List.class));
+        return result;
+    }"
+13041,"If the request method of quest is POST, use $conn$ to execute SQL (query all columns in the register_users table when id equals $newID$) and get all the data, return to the rendered ""register.html"" page, and pass the query result to the users parameter. Otherwise, return the rendered ""register.html"".","public String register(HttpRequest request, Model model, JdbcTemplate conn, Integer id){
+        if(request.getMethod().equals(""POST"")){
+            String sql = ""select * from register_users where id=?"";
+            List<Object> users = conn.query(sql, new Object[]{id},
+                    new BeanPropertyRowMapper(List.class));
+            model.addAttribute(""users"", users);
+            return ""register.html"";
+        }
+        else {
+            return ""register.html"";
+        }
+    }"
+11193,"Use the JdbcTemplate to connect to the database with where engine is $engine$. Execute the SQL statement (query for all the columns in the Drinkers where name is $name$ and city is $city$) to get all the data, convert each query result item to map, store it as a list, and return.","public List getDrinkers(DataSource engine, String name, String city) {
+        JdbcTemplate connection = new JdbcTemplate(engine);
+        String sql = ""select * from Drinkers where name=? and city=?"";
+        List<Object> drinkData = connection.query(sql, new Object[]{name, city},
+            new BeanPropertyRowMapper(List.class));
+        List<Object> result = new ArrayList<Object>();
+        for(Object r:drinkData){
+            result.add(new HashMap(){{put(""date"", r);}});
+        }
+        return result;
+    }"

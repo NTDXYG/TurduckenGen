@@ -14,12 +14,12 @@ Language.build_library(
 
     # Include one or more languages
     [
-        'vendor/tree-sitter-go',
-        'vendor/tree-sitter-javascript',
+        # 'vendor/tree-sitter-go',
+        # 'vendor/tree-sitter-javascript',
         'vendor/tree-sitter-python',
         'vendor/tree-sitter-java',
-        'vendor/tree-sitter-php',
-        'vendor/tree-sitter-ruby',
-        'vendor/tree-sitter-c-sharp'
+        # 'vendor/tree-sitter-php',
+        # 'vendor/tree-sitter-ruby',
+        # 'vendor/tree-sitter-c-sharp'
     ]
 )
