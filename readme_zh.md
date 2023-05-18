@@ -1,21 +1,21 @@
-### �������ݼ�
+### 关于数据集
 
-- Lyra�е�ԭʼ���ݼ���'dataset/Python'Ŀ¼��Lyra-python-xxx.csv��
-- Pisces�е�ԭʼ���ݼ���'dataset/Java'Ŀ¼��Pisces-java-xxx.csv��
+- Lyra中的原始数据集在'dataset/Python'目录的Lyra-python-xxx.csv中
+- Pisces中的原始数据集在'dataset/Java'目录的Pisces-java-xxx.csv中
 
-Pisces�е��������ݾ�ͨ�����룬��������Lyra��δ�ṩ����������Pisces��Ҳ��û�в��������ġ�
+Pisces中的所有数据均通过编译，但是由于Lyra中未提供测试用例，Pisces中也是没有测试用例的。
 
-��ˣ�����������Ĺ�����ȷʱ��ȻҪ����human study����ɡ�
+因此，在评估代码的功能正确时依然要依赖human study来完成。
 
-### ����Compiler
+### 关于Compiler
 
-- Lyra����ʹ��pylint����б����⣬���ǵİ汾��python3.9��������������ο�https://github.com/LIANGQINGYUAN/Lyra
-- Pisces����ʹ�õ�Maven���б����⣨��Ϊʹ����Springboot�������ǵİ汾��jdk1.8����ɵ�pom.xml�ļ����ṩ��
+- Lyra我们使用pylint库进行编译检测，我们的版本是python3.9，其余的依赖包参考https://github.com/LIANGQINGYUAN/Lyra
+- Pisces我们使用的Maven进行编译检测（因为使用了Springboot），我们的版本是jdk1.8，相干的pom.xml文件已提供。
 
-### ����SAT�㷨
+### 关于SAT算法
 
-����SAT-Code�⿪Դ�������ʵ�֣�demo��SAT-demo.py�С�
+借助[SAT-Code库](https://github.com/NougatCA/SPT-Code)开源代码进行实现，demo在SAT-demo.py中。
 
 ### HOW TU RUN
 
-�޸Ĳ���������run.py
+修改参数并运行run.py
