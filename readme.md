@@ -14,7 +14,7 @@ Therefore, human study is still needed to evaluate the correctness of the code.
 
 ### About SAT Algorithm
 
-We implemented the SAT algorithm using the open-source SAT-Code library, with the demo provided in 'SAT-demo.py'.
+We implemented the SAT algorithm using the open-source [SPT-Code](https://github.com/NougatCA/SPT-Code), with the demo provided in 'SAT-demo.py'.
 
 ### HOW TO RUN
 
